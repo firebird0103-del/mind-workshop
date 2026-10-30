@@ -1,0 +1,21 @@
+#stats-modal .modal-content{max-width:640px}
+#stats-modal .record-item,#stats-modal .rank-item{overflow-wrap:anywhere}
+.records-transfer{margin-top:22px;padding-top:18px;border-top:1px solid #ead7c2}
+.records-transfer-actions{display:flex;flex-wrap:wrap;gap:10px}
+.records-transfer button{min-height:46px;border:1px solid #b7cfdc;border-radius:12px;padding:10px 18px;font:inherit;font-size:15px;background:#fff;color:#163654;cursor:pointer}
+.records-transfer .records-primary{background:#0a7198;color:#fff;border-color:#0a7198}
+.records-transfer button:disabled,#stats-modal button:disabled{opacity:.55;cursor:wait}
+.records-transfer .records-note{font-size:13px;line-height:1.6;margin:10px 0;color:#766957!important}
+.records-transfer-status{font-size:14px;line-height:1.65;color:#007a77;overflow-wrap:anywhere}
+.records-transfer-status.is-error{color:#b43d2b}
+.records-import-preview{margin-top:14px;padding:16px;border:1px solid #d8c9a7;border-radius:14px;background:#fff8e7}
+.records-import-preview[hidden]{display:none}
+.records-import-preview h3{margin:0 0 10px;font-size:18px}
+.records-import-counts{white-space:pre-line;font-size:14px;line-height:1.8;overflow-wrap:anywhere}
+.records-import-games{font-size:13px;line-height:1.7;margin-block:8px;overflow-wrap:anywhere}
+.records-import-preview fieldset{border:0;padding:0;margin:14px 0}
+.records-import-preview legend{font-weight:600;margin-bottom:6px}
+.records-import-preview label{display:flex;align-items:center;gap:8px;min-height:44px;font-size:15px}
+.records-import-preview input{width:18px;height:18px;flex-shrink:0}
+.records-import-effect{font-size:14px;line-height:1.7;margin:8px 0 14px;overflow-wrap:anywhere}
+@media(max-width:440px){.records-transfer-actions button{flex:1;padding-inline:10px}.records-import-preview{padding:12px}#stats-modal .modal-content{padding-inline:16px}.tab-btn{font-size:14px}}

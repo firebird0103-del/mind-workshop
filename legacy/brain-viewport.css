@@ -1,0 +1,62 @@
+/* v6: prioritize available height, without clipping content or disabling zoom. */
+body[data-game-id] main.game-card:hover,
+body[data-game-id] main.game-card:focus-visible {transform:none!important;}
+body[data-game-id="memory"],
+body[data-game-id="clock"],
+body[data-game-id="executive"] {padding-top:12px;padding-bottom:10px;}
+body[data-game-id="memory"] .topbar,
+body[data-game-id="clock"] .topbar,
+body[data-game-id="executive"] .topbar {margin-bottom:10px;}
+body[data-game-id="memory"] .game-card {max-width:1480px;padding:18px!important;min-height:0!important;}
+body[data-game-id="memory"] .game-layout {grid-template-columns:minmax(240px,300px) minmax(0,1fr);gap:24px;align-items:start;}
+body[data-game-id="memory"] .info-area {gap:12px;}
+body[data-game-id="memory"] .play-area {gap:10px;min-width:0;}
+body[data-game-id="memory"] .memory-stage {padding:16px;width:100%;min-width:0;}
+body[data-game-id="memory"] .memory-stage::before {display:none;}
+body[data-game-id="memory"] .memory-content {gap:12px;min-width:0;}
+body[data-game-id="memory"] #display-area {width:clamp(180px,calc(100dvh - 290px),320px);height:auto;aspect-ratio:1;}
+body[data-game-id="memory"] #answer-area {gap:8px;padding-bottom:18px;flex-wrap:wrap;min-width:0;}
+body[data-game-id="memory"] .slot {width:var(--memory-slot-size,64px);height:var(--memory-slot-size,64px);min-width:52px;flex:none;padding:2px;}
+body[data-game-id="memory"] .slot::after {bottom:-17px;}
+body[data-game-id="memory"] #options-area {grid-template-columns:repeat(var(--memory-cols,5),var(--memory-option-size,88px));gap:8px;width:max-content;max-width:100%;justify-content:center;}
+body[data-game-id="memory"] .option-btn {width:var(--memory-option-size,88px);height:var(--memory-option-size,88px);min-height:56px;min-width:56px;padding:2px;aspect-ratio:1;}
+body[data-game-id="memory"] .result-board {padding:12px;margin:0;font-size:17px;line-height:1.5;}
+body[data-game-id="memory"] .answer-reveal {gap:8px;margin-top:8px;}
+body[data-game-id="memory"] .answer-reveal li {width:var(--memory-slot-size,64px);padding:3px;line-height:1.4;font-size:13px;}
+body[data-game-id="memory"] .answer-reveal .object-art {width:100%;height:auto;aspect-ratio:1;}
+body[data-game-id="memory"] .micro-notice {display:none;}
+body[data-game-id="memory"] .micro-notice.is-visible {display:block;min-height:38px;font-size:14px;}
+body[data-game-id="memory"] .main-action-btn {min-height:48px;padding:10px 24px;}
+body[data-game-id="memory"][data-phase="review"] .sequence-label {color:#17324d;font-size:16px;}
+body[data-game-id="memory"][data-phase="finished"] .memory-stage {max-width:700px;}
+/* Clock has room reserved for hint, feedback and action buttons. */
+body[data-game-id="clock"] .game-card {padding:18px!important;min-height:0!important;}
+body[data-game-id="clock"] .game-layout {grid-template-columns:minmax(240px,320px) minmax(0,1fr);gap:24px;align-items:start;}
+body[data-game-id="clock"] .play-area {gap:10px;min-width:0;}
+body[data-game-id="clock"] .clock-stage {width:min(100%,var(--clock-size,clamp(280px,calc(100dvh - 330px),600px)));max-width:640px;}
+body[data-game-id="clock"] .bc-game-hint {min-height:38px;padding:7px 10px;}
+body[data-game-id="clock"] #result-board {padding:10px 12px;font-size:17px;}
+body[data-game-id="clock"] .main-action-btn {min-height:48px;padding:10px 20px;}
+/* Shape/color choices adapt to remaining height rather than fixed 180px rows. */
+body[data-game-id="executive"] .game-card {padding:18px!important;min-height:0!important;}
+body[data-game-id="executive"] .instruction {padding:12px 16px;}
+body[data-game-id="executive"] .tip {margin:10px 0 14px;padding:10px 14px;}
+body[data-game-id="executive"] .choices {grid-template-columns:repeat(var(--choice-cols,4),minmax(0,var(--choice-size,150px)));gap:12px;justify-content:center;}
+body[data-game-id="executive"] .choice {min-height:var(--choice-size,150px);height:var(--choice-size,150px);}
+body[data-game-id="executive"] .symbol {width:80%;height:80%;}
+body[data-game-id="executive"] .shape {width:clamp(56px,calc(var(--choice-size,150px)*.52),80px);height:clamp(56px,calc(var(--choice-size,150px)*.52),80px);}
+body[data-game-id="executive"] .action-row:has(button[style*="display: none"]) {margin-top:0;}
+@media(max-width:820px){
+ body[data-game-id="memory"] .game-layout,body[data-game-id="clock"] .game-layout {grid-template-columns:1fr;gap:14px;}
+ body[data-game-id="memory"] .info-area,body[data-game-id="clock"] .info-area {display:grid;grid-template-columns:1fr 1fr;text-align:left;align-items:center;gap:10px;}
+ body[data-game-id="memory"] .eyebrow,body[data-game-id="clock"] .eyebrow {grid-column:1/-1;}
+ body[data-game-id="memory"] .instruction,body[data-game-id="clock"] .instruction {grid-column:1/-1;max-width:none;margin:0;}
+ body[data-game-id="memory"] .tips,body[data-game-id="clock"] .tips {grid-column:1/-1;padding:8px 10px;font-size:13px;}
+ body[data-game-id="memory"] .title-row,body[data-game-id="clock"] .title-row {justify-content:flex-start;}
+}
+@media(max-width:480px){
+ body[data-game-id="memory"] .game-card,body[data-game-id="clock"] .game-card,body[data-game-id="executive"] .game-card {padding:12px!important;}
+ body[data-game-id="memory"] .memory-stage {padding:10px;}
+ body[data-game-id="memory"] .info-area,body[data-game-id="clock"] .info-area {grid-template-columns:1fr;}
+ body[data-game-id="memory"] .title-row h1,body[data-game-id="clock"] .title-row h1 {font-size:26px;}
+}

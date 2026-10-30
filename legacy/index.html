@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>心智大作戰｜Brain Challenge</title>
+
+    <script src="brain-assets.js"></script>
+    <script src="brain-lobby.js"></script>
+    <script src="brain-games.js"></script>
+<script src="brain-audio.js"></script>
+<script src="brain-feedback.js"></script>
+<script src="brain-config.js"></script>
+<script src="brain-core.js"></script>
+<script src="brain-records-data.js"></script>
+<script src="brain-records-view.js"></script>
+<script src="vendor/jszip.min.js" defer></script>
+<script src="brain-records-workbook.js" defer></script>
+<script src="brain-records-transfer.js" defer></script>
+<link rel="stylesheet" href="brain-records-transfer.css">
+<link rel="stylesheet" href="brain-playground.css">
+<link rel="stylesheet" href="brain-title-art.css">
+</head>
+<body data-app="brain-challenge">
+
+    <header class="hero-header">
+        <div class="hero-brand"><img class="playground-logo" src="assets/yunyun-logo.png" alt="雲雲大腦形象 Logo" width="144" height="96"><h1><span class="wordmark-text">心智大作戰</span><img class="brand-title-art" src="assets/brain-brand-title.svg" alt="" width="2004" height="367" decoding="sync"></h1></div>
+        <section class="playground-intro" aria-labelledby="playground-title">
+            <div class="intro-kicker">MIND IN PLAY</div>
+            <div class="title-frame"><h2 id="playground-title"><span class="wordmark-text">大腦遊樂場</span><img class="playground-title-art" src="assets/playground-title.svg" alt="" width="2077" height="364" decoding="sync" fetchpriority="high"></h2></div>
+            <p>選一站，開啟你的腦力挑戰！</p>
+        </section>
+        <nav class="lobby-tools" aria-label="遊戲設定">
+            <span class="tool-group"><svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h4l5-4v14l-5-4H3Z" fill="currentColor" opacity=".7"/><path d="M16 8c2 2 2 6 0 8m3-11c4 4 4 10 0 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".7"/></svg><button type="button" data-audio-toggle>音效</button></span>
+            <span class="tool-group"><svg class="tool-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="11" width="5" height="11" rx="1.5" fill="#009fa9"/><rect x="9" y="3" width="5" height="19" rx="1.5" fill="#ffc318"/><rect x="16" y="7" width="5" height="15" rx="1.5" fill="#f2793d"/></svg><button type="button" onclick="showLocalStats()">遊玩紀錄 →</button></span>
+        </nav>
+    </header>
+
+    <main class="playground-field" aria-label="四種腦力挑戰"><div class="game-grid" id="game-grid" aria-live="polite"></div></main>
+
+    <section class="setup-section" aria-label="選擇玩家年齡">
+        <span class="setup-frame" aria-hidden="true"><i class="corner corner-tl"></i><i class="corner corner-tr"></i><i class="corner corner-bl"></i><i class="corner corner-br"></i></span>
+        <div class="age-label"><svg class="age-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="5" fill="currentColor"/><path d="M3 22v-3a9 7 0 0 1 18 0v3Z" fill="currentColor"/></svg>選擇年齡：</div>
+        <div class="age-grid" id="age-selector">
+            <button class="age-btn" aria-pressed="false" onclick="selectAge('7-12')">7 ~ 12 歲</button>
+            <button class="age-btn" aria-pressed="false" onclick="selectAge('13-18')">13 ~ 18 歲</button>
+            <button class="age-btn" aria-pressed="false" onclick="selectAge('19-35')">19 ~ 35 歲</button>
+            <button class="age-btn" aria-pressed="false" onclick="selectAge('36-55')">36 ~ 55 歲</button>
+            <button class="age-btn" aria-pressed="false" onclick="selectAge('56-70')">56 ~ 70 歲</button>
+            <button class="age-btn" aria-pressed="false" onclick="selectAge('71+')">71 歲以上</button>
+        </div>
+        <div class="age-notes"><div class="age-hint">年齡只用於紀錄與統計，不會改變遊戲難度。<span id="age-message" role="status"></span></div><footer class="lobby-footer">互動科普體驗｜非醫療診斷工具</footer></div>
+    </section>
+
+    <div class="modal-overlay" id="name-modal">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="name-title">
+            <button type="button" class="close-btn" aria-label="關閉暱稱視窗" onclick="closeNameModal()">×</button>
+            <div class="dialog-kicker">READY TO PLAY</div>
+            <h2 id="name-title" style="text-align:center; color:#2c3e50;">準備開始！</h2>
+            <p style="text-align:center; color:#58708d;">自己輸入暱稱，或選一個喜歡的隨機名字。</p>
+            <label class="name-label" for="player-name">你的暱稱</label>
+            <div class="name-entry-row"><input type="text" id="player-name" class="name-input" placeholder="留白則以訪客開始" maxlength="10" autocomplete="off"><button type="button" id="random-name-btn" class="random-name-btn" onclick="refreshNameSuggestions(true)">隨機取名</button></div>
+            <div id="name-suggestions" class="name-suggestions" role="group" aria-label="點選一個建議暱稱"></div>
+            <div id="name-status" class="name-status" role="status" aria-live="polite"></div>
+            <button class="start-now-btn" onclick="confirmStart()">開始挑戰</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="stats-modal">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="stats-title">
+            <button type="button" class="close-btn" aria-label="關閉遊玩紀錄" onclick="closeStatsModal()">×</button>
+            <div class="dialog-kicker">PLAY RECORDS</div>
+            <h2 id="stats-title" style="margin-top:0; color:#2c3e50; text-align:center;">心智大作戰成績</h2>
+            
+            <div class="tab-group">
+                <button class="tab-btn active" id="tab-rank" onclick="switchTab('rank')">英雄榜</button>
+                <button class="tab-btn" id="tab-stats" onclick="switchTab('stats')">趨勢分析</button>
+                <button class="tab-btn" id="tab-history" onclick="switchTab('history')">最近紀錄</button>
+            </div>
+            
+            <div id="modal-rank-area"></div>
+            <div id="modal-stats-area" style="display: none;"></div>
+            <div id="modal-history-area" style="display: none;"></div>
+            <section class="records-transfer" id="records-transfer" aria-label="資料匯出與還原">
+                <div class="records-transfer-actions">
+                    <button type="button" id="records-export-button" class="records-primary" data-transfer-control>匯出資料</button>
+                    <button type="button" id="records-import-button" data-transfer-control>匯入備份</button>
+                </div>
+                <input type="file" id="records-import-file" accept=".zip,.json" hidden data-transfer-control>
+                <p class="records-note"><span id="records-total"></span>。匯出 ZIP 內含研究用 Excel 與可還原的完整備份。</p>
+                <div id="records-transfer-status" class="records-transfer-status" role="status" aria-live="polite"></div>
+                <section class="records-import-preview" id="records-import-preview" aria-labelledby="records-import-title" hidden>
+                    <h3 id="records-import-title">確認匯入內容</h3>
+                    <div id="records-import-counts" class="records-import-counts"></div>
+                    <div id="records-import-games" class="records-import-games"></div>
+                    <fieldset><legend>匯入方式</legend>
+                        <label><input type="radio" id="records-mode-merge" name="records-import-mode" value="merge" checked data-transfer-control>合併紀錄（略過重複）</label>
+                        <label><input type="radio" id="records-mode-replace" name="records-import-mode" value="replace" data-transfer-control>以備份取代目前紀錄</label>
+                    </fieldset>
+                    <div id="records-import-effect" class="records-import-effect"></div>
+                    <div class="records-transfer-actions">
+                        <button type="button" id="records-import-confirm" class="records-primary" data-transfer-control>確認匯入</button>
+                        <button type="button" id="records-import-cancel" data-transfer-control>取消</button>
+                    </div>
+                </section>
+            </section>
+            <button class="clear-btn" onclick="clearHistory()">清除所有紀錄</button>
+        </div>
+    </div>
+
+    <script src="brain-names.js"></script>
+    <script>
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        let selectedAgeGroup = "";
+        let pendingGameUrl = "";
+
+        // --- 年齡選擇 ---
+        function selectAge(group) {
+            selectedAgeGroup = group;
+            document.querySelector('.setup-section').classList.remove('needs-age');
+            document.getElementById('age-message').textContent = '';
+            const buttons = document.querySelectorAll('.age-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-pressed', String(btn.getAttribute('onclick').includes(`'${group}'`)));
+                if (btn.getAttribute('onclick').includes(`'${group}'`)) btn.classList.add('active');
+            });
+            if (window.BrainChallenge) BrainChallenge.player.setAge(group); else localStorage.setItem('currentUserAge', group);
+        }
+
+        // --- Game Module Launcher：依註冊表動態產生遊戲卡片 ---
+        function renderGameGrid() {
+            const grid = document.getElementById('game-grid');
+            if (!grid) return;
+            const modules = window.BrainChallengeModules?.list?.({ enabledOnly: true }) || [];
+            grid.innerHTML = '';
+
+            modules.forEach((game, index) => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.dataset.gameId = game.id;
+                card.setAttribute('role', 'button');
+                card.setAttribute('tabindex', '0');
+                card.setAttribute('aria-label', `開始${game.title}`);
+                card.innerHTML = `
+                    
+                    <span class="station-frame" aria-hidden="true"><i class="corner corner-tl"></i><i class="corner corner-tr"></i><i class="corner corner-bl"></i><i class="corner corner-br"></i></span>\n                    <div class="station-content"><div class="game-info">
+                        <span class="station-copy">
+                            <span class="game-step">${String(index + 1).padStart(2, '0')}</span>
+                            <span class="game-name">${game.title}</span>
+                            <span class="game-desc">${game.description || '立即開始挑戰'}</span>
+                        </span>
+                    </div>
+                    <span class="status-tag status-open">開始 <span class="start-arrow">→</span></span></div>
+                    <span class="lobby-preview" aria-hidden="true">${window.BrainLobby?.preview(game.id) || ''}</span>`;
+
+                const activate = () => openNameModalByGame(game.id);
+                card.addEventListener('click', activate);
+                card.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        activate();
+                    }
+                });
+                grid.appendChild(card);
+            });
+
+            if (!modules.length) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:#8aa0ab;font-weight:800;">目前沒有可用的挑戰遊戲。</div>';
+            }
+        }
+
+        function openNameModalByGame(gameId) {
+            const game = window.BrainChallenge && BrainChallenge.getGame(gameId);
+            if (!game || game.enabled === false) { alert('此遊戲目前無法啟動。'); return; }
+            openNameModal(game.file);
+        }
+
+        function openNameModal(url) {
+            if (!selectedAgeGroup) {
+                const hint = document.getElementById('age-message');
+                hint.textContent = '請先選擇年齡，再開始挑戰。';
+                document.querySelector('.setup-section').classList.add('needs-age');
+                document.querySelector('.age-btn').focus();
+                return;
+            }
+            pendingGameUrl = url;
+            // 預填上一次用的名字（若有）
+            try { document.getElementById('player-name').value = localStorage.getItem('lastPlayerName') || ""; }
+            catch (_) { document.getElementById('player-name').value = ""; }
+            document.getElementById('random-name-btn').textContent = '隨機取名';
+            document.getElementById('name-status').textContent = '';
+            refreshNameSuggestions(false);
+            document.getElementById('name-modal').style.display = 'flex';
+            window.BrainLobby?.openDialog?.('name-modal', closeNameModal, 'player-name');
+        }
+
+        function chooseSuggestedName(name) {
+            document.getElementById('player-name').value = name;
+            document.getElementById('name-status').textContent = '已選擇「' + name + '」，也可以自行修改。';
+            document.querySelectorAll('#name-suggestions button').forEach(btn => btn.setAttribute('aria-pressed', String(btn.textContent === name)));
+        }
+
+        function refreshNameSuggestions(selectFirst) {
+            const area = document.getElementById('name-suggestions');
+            const current = document.getElementById('player-name').value;
+            const names = new Set();
+            while (names.size < 3) names.add(BrainChallengeNames.next(current));
+            area.innerHTML = '';
+            names.forEach(name => {
+                const btn = document.createElement('button');
+                btn.type = 'button'; btn.textContent = name;
+                btn.setAttribute('aria-pressed', 'false');
+                btn.addEventListener('click', () => chooseSuggestedName(name));
+                area.appendChild(btn);
+            });
+            if (selectFirst) {
+                chooseSuggestedName([...names][0]);
+                document.getElementById('random-name-btn').textContent = '換一個';
+            }
+        }
+
+        function closeNameModal() { document.getElementById('name-modal').style.display = 'none'; window.BrainLobby?.closeDialog?.(); }
+
+        document.getElementById('player-name').addEventListener('input', () => {
+            document.getElementById('name-status').textContent = '';
+            document.querySelectorAll('#name-suggestions button').forEach(btn => btn.setAttribute('aria-pressed', String(btn.textContent === document.getElementById('player-name').value)));
+        });
+
+        function confirmStart() {
+            let name = document.getElementById('player-name').value.trim();
+            if (!name) name = "訪客";
+            try { localStorage.setItem('lastPlayerName', name); } catch (_) {}
+            // 將當前玩家名字存入 Session，供遊戲頁面讀取
+            if (window.BrainChallenge) BrainChallenge.player.setName(name); else sessionStorage.setItem('currentPlayerName', name);
+            document.body.classList.add('is-launching');
+            const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            window.setTimeout(() => { window.location.href = pendingGameUrl; }, reducedMotion ? 0 : 380);
+        }
+
+        // --- 數據看板邏輯 ---
+        function showLocalStats() {
+            let history;
+            try { history = BrainRecordsData.readLocal().records; }
+            catch (error) { alert(error.message); return; }
+            document.getElementById('stats-modal').style.display = 'flex';
+            renderModalData(history);
+            window.BrainLobby?.openDialog?.('stats-modal', closeStatsModal);
+        }
+
+        function closeStatsModal() { document.getElementById('stats-modal').style.display = 'none'; window.BrainLobby?.closeDialog?.(); }
+
+        function switchTab(tabName) {
+            ['rank', 'stats', 'history'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.remove('active');
+                document.getElementById(`modal-${t}-area`).style.display = 'none';
+            });
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            document.getElementById(`modal-${tabName}-area`).style.display = 'block';
+        }
+
+        function renderModalData(history) { BrainRecordsView.render(history); }
+
+        function clearHistory() {
+            if (confirm("確定清除目前瀏覽器的所有紀錄？建議先匯出備份；清除後仍可用備份還原。")) {
+                if (!BrainChallenge.scores.clear()) { alert("無法清除紀錄，請確認瀏覽器允許儲存。"); return; }
+                BrainRecordsTransfer.resetPreview(false);
+                renderModalData([]);
+                BrainRecordsTransfer.status("已清除紀錄。可從「匯入備份」還原先前資料。");
+            }
+        }
+
+        window.onload = function() {
+            let savedAge = null;
+            try { savedAge = localStorage.getItem('currentUserAge'); } catch (_) {}
+            if (savedAge) selectAge(savedAge);
+            renderGameGrid();
+        };
+
+        window.addEventListener('brain:modules-changed', renderGameGrid);
+    </script>
+</body>
+</html>
+
+<script src="island-return.js"></script>

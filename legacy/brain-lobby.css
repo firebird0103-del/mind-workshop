@@ -1,0 +1,48 @@
+body[data-app="brain-challenge"] {background:#fff;padding:24px clamp(18px,4vw,72px);color:#161c30;--bc-ink:#161c30;--bc-muted:#59617b;--bc-blue:#6554ec;--bc-line:#ccd0ef}
+body[data-app="brain-challenge"]::before{display:none}
+body[data-app] .hero-header,body[data-app] .setup-section,body[data-app] .game-grid,.lobby-heading,.lobby-footer{max-width:1440px;margin-left:auto;margin-right:auto}
+body[data-app] .hero-header{gap:14px;padding:0!important;margin-bottom:clamp(24px,4vh,44px)}
+body[data-app] .hero-header h1{font-size:clamp(22px,2vw,30px);margin:0;letter-spacing:0!important}
+body[data-app] .brand-mark{background:transparent!important;width:48px!important;height:48px!important;flex-basis:48px!important;overflow:visible}
+body[data-app] .brand-mark span{width:27px;height:18px;border-radius:14px}
+body[data-app] .brand-mark span:nth-child(1){left:0;top:17px;background:#7661fb}
+body[data-app] .brand-mark span:nth-child(2){left:17px;top:0;width:18px;height:27px;background:#ff806e}
+body[data-app] .brand-mark span:nth-child(3){left:21px;top:17px;bottom:auto;background:#ffd44d}
+body[data-app] .brand-mark span:nth-child(4){left:13px;top:21px;width:18px;height:27px;background:#4cd0ac}
+.lobby-tools{margin-left:auto;display:flex;gap:12px;flex-wrap:wrap}
+.lobby-tools button{min-height:44px;padding:9px 18px;background:#faf9ff;border:1px solid #dcd9f5;border-radius:24px;font:inherit;color:#272441;cursor:pointer}
+.lobby-heading{font-size:clamp(27px,3vw,44px);font-weight:750;line-height:1.3;margin-top:0;margin-bottom:28px}
+body[data-app] .setup-section{display:flex;align-items:center;gap:18px;padding:0!important;border:0!important;box-shadow:none!important;margin-bottom:30px}
+.age-label{font-weight:700;white-space:nowrap}
+body[data-app] .age-grid{flex:1;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:0}
+body[data-app] .age-btn{font-size:16px;font-weight:500;min-height:46px;padding:8px 5px;border-radius:26px!important;white-space:nowrap}
+body[data-app] .age-btn.active{background:#6554ec!important;border-color:#6554ec!important}
+body[data-app] .age-hint{max-width:170px;border-left:1px solid #ccd0ef;padding-left:16px;text-align:left;margin:0;font-weight:400;line-height:1.6}
+body[data-app] .game-grid{gap:24px!important}
+body[data-app] .game-card{--card-accent:#6554ec;min-height:clamp(194px,27vh,265px)!important;padding:24px!important;border:1px solid #bcc4ec!important;border-radius:13px!important;box-shadow:none!important;display:block;transition:background .16s,border-color .16s,transform .16s}
+body[data-app] .game-card[data-game-id="attention"]{--card-accent:#f07865}
+body[data-app] .game-card[data-game-id="memory"]{--card-accent:#f8cf3e}
+body[data-app] .game-card[data-game-id="executive"]{--card-accent:#50cdaa}
+body[data-app] .game-card:hover,body[data-app] .game-card:focus-visible{border-color:var(--card-accent)!important;background:#fbfbff!important;box-shadow:none!important;transform:translateY(-2px)!important;outline:2px solid var(--card-accent);outline-offset:3px}
+body[data-app] .game-card:active{transform:scale(.995)!important}
+body[data-app] .game-info{display:block;padding-right:150px}
+body[data-app] .game-step{display:grid;place-items:center;width:42px;height:42px;border-radius:50%!important;background:var(--card-accent)!important;color:#fff!important;font-size:18px;letter-spacing:0}
+body[data-app] [data-game-id="memory"] .game-step,body[data-app] [data-game-id="executive"] .game-step{color:#17233a!important}
+body[data-app] .game-name{font-size:clamp(24px,2.4vw,34px);margin-top:16px;font-weight:750}
+body[data-app] .game-desc{font-size:clamp(16px,1.5vw,20px);font-weight:400;margin-top:8px;line-height:1.5}
+body[data-app] .status-tag{position:absolute;right:24px;bottom:20px;display:flex;align-items:center;gap:10px;background:transparent!important;color:#161c30;padding:0;font-size:18px;margin:0}
+.start-arrow{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--card-accent);color:#17233a;font-size:28px;font-weight:400}
+.lobby-preview{position:absolute;right:24px;top:20px;display:flex;justify-content:flex-end;width:140px;height:100px;pointer-events:none}
+.preview-clock{width:90px;height:90px}
+.lobby-preview .object-art{display:block;width:100%;height:100%}
+.preview-diff{display:grid;grid-template-columns:repeat(2,1fr);width:96px;height:96px;border:1px solid #ccd0ef;border-radius:6px;overflow:hidden}
+.preview-diff>span{position:relative;border:1px solid #eef0f8;padding:3px}
+.preview-diff .circled::after{content:"";position:absolute;inset:1px;border:2px solid #f07865;border-radius:50%}
+.preview-memory{display:flex;gap:5px;width:140px;padding-top:10px}
+.preview-memory>span{width:43px;text-align:center}.preview-memory .object-art{height:48px}.preview-memory small{font-size:13px}
+.preview-shapes{display:grid;grid-template-columns:repeat(2,30px);gap:10px;width:70px;height:70px;margin-top:5px}
+.preview-shapes i{background:#ff625e;border-radius:50%}.preview-shapes i:nth-child(2){background:#0877ff;border-radius:0;clip-path:polygon(50% 0,100% 100%,0 100%)}.preview-shapes i:nth-child(3){background:#ffd126;border-radius:3px}.preview-shapes i:nth-child(4){background:#02b49e;border-radius:3px;transform:rotate(45deg) scale(.76)}
+.lobby-footer{text-align:right;color:#747e98;font-size:13px;margin-top:22px}
+@media(max-width:1100px){body[data-app] .setup-section{flex-wrap:wrap}.age-hint{max-width:none!important;border:0!important;padding:0!important;flex-basis:100%}body[data-app] .game-info{padding-right:118px}.lobby-preview{width:110px}.preview-memory{width:110px}.preview-memory>span{width:33px}}
+@media(max-width:700px){.lobby-tools{gap:6px}.lobby-tools button{padding:8px 12px;font-size:14px}body[data-app] .hero-header{flex-wrap:wrap}.lobby-heading{margin-bottom:20px}body[data-app] .age-grid{grid-template-columns:repeat(3,1fr);flex-basis:100%}body[data-app] .game-grid{grid-template-columns:1fr!important}body[data-app] .game-card{min-height:220px!important}.lobby-footer{text-align:center}}
+@media(prefers-reduced-motion:reduce){body[data-app] .game-card{transition:none}body[data-app] .game-card:hover{transform:none!important}}

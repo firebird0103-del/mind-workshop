@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>心智大作戰｜平台自檢</title>
+<style>
+:root{--bg:#071c2e;--panel:#fff;--text:#17324d;--ok:#2aa67f;--bad:#d6535d;--muted:#6c7d88;}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:18px;font-family:"Microsoft JhengHei","微軟正黑體",Arial,sans-serif;background:linear-gradient(160deg,#061a2b,#0b3149 60%,#092238);color:var(--text)}
+.wrap{width:min(960px,100%);margin:0 auto}.top{color:#fff;margin:10px 0 16px}.top small{letter-spacing:.18em;opacity:.65}.top h1{margin:6px 0 0;font-size:clamp(1.5rem,4vw,2rem)}
+.card{background:rgba(255,255,255,.98);border-radius:24px;padding:24px;box-shadow:0 18px 48px rgba(0,0,0,.22)}
+.summary{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:14px 16px;border-radius:16px;background:#f5f8fa;margin-bottom:16px}.summary strong{font-size:1.4rem}.badge{font-weight:900;padding:7px 11px;border-radius:999px;color:#fff}.ok{background:var(--ok)}.bad{background:var(--bad)}
+.rows{display:grid;gap:9px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 13px;border:1px solid #e5edf1;border-radius:14px}.name{font-weight:900}.detail{font-size:.82rem;color:var(--muted);text-align:right}.foot{margin-top:16px;color:var(--muted);font-size:.85rem;line-height:1.55}
+button{margin-top:16px;border:0;border-radius:14px;min-height:48px;padding:10px 18px;background:#32a9e8;color:#fff;font-weight:900;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><small>BRAIN CHALLENGE</small><h1>平台自檢</h1></div>
+  <main class="card">
+    <div class="summary"><div><div style="color:#6c7d88;font-size:.85rem">目前平台版本</div><strong id="version">—</strong></div><div id="status" class="badge">檢查中</div></div>
+    <div class="rows" id="rows"></div>
+    <button type="button" onclick="runCheck()">重新檢查</button>
+    <div class="foot">此頁只供展覽部署前檢查；不會改動遊戲分數、Config 或玩家資料。</div>
+  </main>
+</div>
+<script src="brain-games.js"></script>
+<script src="brain-audio.js"></script>
+<script src="brain-feedback.js"></script>
+<script src="brain-config.js"></script>
+<script src="brain-assets.js"></script>
+<script src="brain-core.js"></script>
+<script src="brain-platform.js"></script>
+<script>
+function runCheck(){
+  const report=window.BrainChallengePlatform.check();
+  document.getElementById('version').textContent=report.version;
+  const status=document.getElementById('status');
+  status.textContent=report.ok?'PASS':'CHECK';
+  status.className='badge '+(report.ok?'ok':'bad');
+  document.getElementById('rows').innerHTML=report.results.map(item=>`<div class="row"><div class="name">${item.name}</div><div class="detail">${item.ok?'正常':'異常'}</div></div>`).join('');
+}
+runCheck();
+</script>
+</body>
+</html>

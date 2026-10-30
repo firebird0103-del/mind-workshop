@@ -1,0 +1,8 @@
+/* Animate UI feedback only; never animate timed stimuli or delay the next trial. */
+@keyframes bc-reveal{from{opacity:.5;transform:translateY(4px)}to{opacity:1;transform:none}}
+.modal-content,.finish-card,.finish,.finish-actions{animation:bc-reveal .2s ease-out}
+[data-phase="review"] #result-board,[data-phase="finished"] #result-board,[data-phase="finished"] #final-panel{animation:bc-reveal .2s ease-out}
+.topbar{flex-wrap:wrap}
+[data-audio-toggle]{min-height:44px;white-space:nowrap}
+button:focus-visible,[role="button"]:focus-visible{outline:3px solid #6554ec;outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.modal-content,.finish-card,.finish,.finish-actions,#result-board,#final-panel{animation:none!important}}

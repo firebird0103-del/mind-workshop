@@ -1,0 +1,70 @@
+/* 心智大作戰｜Responsive / Touch First 基礎層 2.5 */
+:root {
+  --bc-safe-top: env(safe-area-inset-top, 0px);
+  --bc-safe-right: env(safe-area-inset-right, 0px);
+  --bc-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --bc-safe-left: env(safe-area-inset-left, 0px);
+  --bc-touch-min: 48px;
+}
+
+html {
+  min-width: 0;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  min-width: 0;
+  padding-left: max(12px, var(--bc-safe-left));
+  padding-right: max(12px, var(--bc-safe-right));
+  padding-bottom: max(12px, var(--bc-safe-bottom));
+}
+
+button,
+a,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+input,
+textarea,
+select,
+button {
+  font: inherit;
+}
+
+button {
+  min-width: var(--bc-touch-min);
+}
+
+.bc-game-hint {
+  width: 100%;
+  max-width: 520px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(246, 251, 253, 0.96);
+  border: 1px solid rgba(34, 92, 121, 0.10);
+  color: #6f8795;
+  font-size: clamp(.78rem, 1.6vw, .9rem);
+  font-weight: 800;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.bc-game-hint:empty { display: none; }
+
+@media (max-width: 820px) {
+  .bc-game-hint { max-width: 620px; }
+}
+
+@media (max-width: 600px) {
+  .bc-game-hint { min-height: 42px; padding: 9px 12px; border-radius: 12px; }
+}
+
+@media (orientation: landscape) and (max-height: 620px) {
+  .bc-game-hint { min-height: 38px; padding: 7px 10px; font-size: .76rem; }
+}

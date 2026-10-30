@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-TW"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>多彩生活物件｜素材總覽</title><link rel="stylesheet" href="brain-object-art.css">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f9ff;color:#092b5a;font-family:"Microsoft JhengHei",sans-serif;padding:32px 20px}
+main{max-width:1200px;margin:auto}h1{font-size:30px;margin:0 0 12px}p{line-height:1.8;color:#516d8f}nav{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0 30px}
+nav a{color:#1769e0;background:#fff;padding:10px 16px;border-radius:10px;text-decoration:none;border:1px solid #d7e4f3}
+h2{font-size:21px;margin:36px 0 16px}section{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px}
+figure{margin:0;background:#fff;border:1px solid #dce7f5;border-radius:15px;padding:10px;display:flex;align-items:center;flex-direction:column}
+.art{width:100%;aspect-ratio:1}.art .object-art{width:100%;height:100%}
+figcaption{font-weight:700;margin:8px}.size-check{width:48px;height:48px;border:1px solid #dce7f5;border-radius:6px}.size-check .object-art{width:100%;height:100%}
+small{font-size:11px;color:#6a809e;margin-top:4px}
+@media(max-width:480px){section{grid-template-columns:repeat(2,minmax(0,1fr))}body{padding:20px 12px}}
+</style></head>
+<body><main><h1>100 種多彩生活物件</h1><p>上方看完整圖，下方看 48px 的實際小尺寸。遊戲使用同一批圖片，不是另一套示意素材。<br>找錯同一盤面不重複；預設三題也不會跨題重複。</p>
+<nav><a href="index.html">進入遊戲大廳 →</a><a href="find_diff_game.html">找錯新布局 →</a><a href="memory_game_hard.html">工作記憶 →</a><a href="assets/ARTWORK.md">圖庫與生成紀錄</a></nav>
+<div id="gallery"></div></main>
+<script src="brain-assets.js"></script><script>
+const pool=BrainChallengeAssets.api.getPool('attention'),gallery=document.getElementById('gallery');
+[...new Set(pool.map(item=>item.category))].forEach(category=>{
+ const heading=document.createElement('h2');heading.textContent=category;gallery.appendChild(heading);
+ const section=document.createElement('section');section.setAttribute('aria-label',category);
+ pool.filter(item=>item.category===category).forEach(item=>{
+  const figure=document.createElement('figure');
+  figure.innerHTML='<div class="art">'+item.markup+'</div><figcaption>'+item.label+'</figcaption><div class="size-check" aria-hidden="true">'+item.markup+'</div><small>48px 檢視</small>';
+  section.appendChild(figure);
+ });
+ gallery.appendChild(section);
+});
+</script></body></html>

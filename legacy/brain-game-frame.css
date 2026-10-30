@@ -1,0 +1,74 @@
+/* v10.4: one stable outer frame per game, shared by the toolbar and panel.
+ * Internal play areas remain responsive to their own content and viewport. */
+body[data-game-id="clock"] { --game-frame-max: 1180px; }
+/* Reserve vertical room for navigation, instructions, board headings and
+ * actions. Size the shared frame for the board pair, not a 1920px backdrop.
+ * The cap depends on the viewport only, so rounds cannot shift its edges. */
+body[data-game-id="attention"] {
+  --game-frame-max: clamp(720px, calc(200svh - 620px), 1480px);
+}
+body[data-game-id="memory"] { --game-frame-max: 1480px; }
+body[data-game-id="executive"] { --game-frame-max: 1120px; }
+
+body[data-game-id] .topbar,
+body[data-game-id] main.game-card {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--game-frame-max) !important;
+  margin-inline: auto;
+}
+
+body[data-game-id] .topbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+body[data-game-id] .topbar > .brand {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+  min-width: 0;
+}
+
+body[data-game-id] .topbar > .exit-btn:not([data-audio-toggle]) {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+}
+
+body[data-game-id] .topbar > [data-audio-toggle] {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+}
+
+body[data-game-id] .topbar > button { white-space: nowrap; }
+
+/* Navigation, instructions, board pair and actions share the same edges.
+ * The inner grid keeps its minimum cell size and local scrolling. */
+body[data-game-id="attention"] .info-area,
+body[data-game-id="attention"] .grid-pair,
+body[data-game-id="attention"] .round-footer { width: 100%; }
+
+@media (max-width: 640px) {
+  body[data-game-id="attention"] { --game-frame-max: 480px; }
+}
+
+@media (max-width: 600px) {
+  body[data-game-id] .topbar { gap: 8px; }
+  body[data-game-id] .topbar > .brand {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+  body[data-game-id] .topbar > .exit-btn:not([data-audio-toggle]),
+  body[data-game-id] .topbar > [data-audio-toggle] { grid-row: 2; }
+  body[data-game-id] .topbar > button {
+    min-height: 44px;
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+}

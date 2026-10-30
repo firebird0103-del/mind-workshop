@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>心智大作戰｜遊戲參數後台</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#1f2937;--muted:#64748b;--primary:#2563eb;--accent:#0f766e;--border:#dbe3ef;--danger:#b91c1c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif}
+.wrap{max-width:1120px;margin:0 auto;padding:24px}
+header{margin-bottom:20px}h1{margin:0 0 6px;font-size:clamp(1.7rem,3vw,2.4rem)}.sub{color:var(--muted)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.btn{border:1px solid transparent;border-radius:12px;padding:12px 16px;font:inherit;font-weight:700;cursor:pointer}.primary{background:var(--primary);color:#fff}.secondary{background:#e8eef8;color:#24324a}.danger{background:#fee2e2;color:var(--danger)}
+.status{margin:12px 0;padding:12px 14px;border-radius:12px;background:#ecfdf5;color:#166534;display:none}.status.show{display:block}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px;box-shadow:0 4px 18px rgba(15,23,42,.05)}.card h2{margin:0 0 4px;font-size:1.35rem}.desc{margin:0 0 16px;color:var(--muted);font-size:.95rem}.group{padding:14px 0;border-top:1px solid #eef2f7}.group:first-of-type{border-top:0;padding-top:0}.label{display:flex;justify-content:space-between;gap:12px;align-items:center;font-weight:700;margin-bottom:8px}.value{min-width:78px;text-align:right;font-variant-numeric:tabular-nums;color:var(--primary)}input[type=range]{width:100%;accent-color:var(--primary)}.hint{font-size:.82rem;color:var(--muted);margin-top:5px}.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}.modeInfo{margin:0 0 18px;padding:12px 14px;border-radius:12px;background:#eff6ff;color:#1e40af;line-height:1.6}.footerNote{margin-top:18px;color:var(--muted);font-size:.9rem;line-height:1.6}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}@media(max-width:520px){.wrap{padding:14px}.pair{grid-template-columns:1fr}.toolbar .btn{flex:1 1 100%}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>心智大作戰｜遊戲參數後台</h1>
+<div class="sub">用滑桿調整遊戲難度與節奏。套用後會儲存在本機瀏覽器，之後重新開遊戲仍會使用這組設定。</div>
+</header>
+<div class="toolbar">
+<select id="modeSelect" class="btn secondary" aria-label="遊戲模式"><option value="exhibition">展覽模式</option><option value="challenge">挑戰模式</option><option value="custom">自訂模式</option></select>
+<button class="btn primary" id="applyModeBtn">套用模式</button>
+<button class="btn primary" id="saveBtn">套用並儲存</button>
+<button class="btn secondary" id="resetBtn">全部恢復預設</button>
+</div>
+<div id="status" class="status"></div>
+<div id="modeInfo" class="modeInfo"></div>
+<div id="editor" class="grid"></div>
+<p class="footerNote">目前不以玩家年齡自動改變難度。這個後台調整的是「遊戲本身的固定參數」，方便展覽前由工作人員設定。</p>
+</div>
+<script src="brain-config.js"></script>
+<script>
+(function(){
+'use strict';
+const API=window.BrainChallengeConfigAPI;
+const status=document.getElementById('status');
+const editor=document.getElementById('editor');
+const modeSelect=document.getElementById('modeSelect');
+const modeInfo=document.getElementById('modeInfo');
+const specs={
+ clock:{title:'第一關｜空間認知',desc:'回合、指針容許角度與分數。',fields:[
+  ['rounds','遊戲回合數',1,10,1,'rounds'],
+  ['angleTolerance.hour','時針判定容許角度',3,30,1,'°'],
+  ['angleTolerance.minute','分針判定容許角度',3,30,1,'°'],
+  ['scoring.fullScore','完全正確分數',0,200,5,'分'],
+  ['scoring.partialScore','單指針正確分數',0,150,5,'分']
+ ]},
+ attention:{title:'第二關｜視覺注意力',desc:'回合、每回合格數與找錯數。',fields:[
+  ['rounds','遊戲回合數',1,3,1,'rounds'],
+  ['gridSizes.0','第 1 回合：N × N',3,8,1,''],
+  ['gridSizes.1','第 2 回合：N × N',3,8,1,''],
+  ['gridSizes.2','第 3 回合：N × N',3,8,1,''],
+  ['differencesPerRound','每回合要找的差異數',1,8,1,'個'],
+  ['scoring.wrongPenalty','點錯扣分',0,30,1,'分']
+ ]},
+ memory:{title:'第三關｜工作記憶',desc:'記憶數量、圖片節奏與倒數。',fields:[
+  ['rounds','遊戲回合數',1,8,1,'rounds'],
+  ['sequenceLength','每回合要記幾張',3,8,1,'張'],
+  ['sequence.imageDurationMs','每張圖片出現',400,3000,100, 'ms'],
+  ['sequence.imageGapMs','圖片間隔',0,1500,50,'ms'],
+  ['sequence.countdownStepMs','3 / 2 / 1 每拍',500,2000,100,'ms'],
+  ['sequence.countdownGoMs','GO 停留',500,2000,100,'ms'],
+  ['answerOptions.distractorCount','干擾圖形數量',5,25,1,'個']
+ ]}
+,
+ executive:{title:'第四關｜語意判斷',desc:'用形狀與顏色切換規則，訓練認知彈性。',fields:[
+  ['rounds','遊戲回合數',2,10,1,'rounds'],
+  ['optionsPerRound','每題選項數',3,6,1,'個'],
+  ['switchEvery','每幾題切換一次規則',1,3,1,'題'],
+  ['scoring.correct','答對分數',50,150,5,'分']
+ ]}
+};
+function getPath(obj,path){return path.split('.').reduce((v,k)=>v[k],obj)}
+function setPath(obj,path,val){const p=path.split('.');let t=obj;for(let i=0;i<p.length-1;i++)t=t[p[i]];t[p[p.length-1]]=val}
+function makeGameCard(gameId,spec){
+ const card=document.createElement('section');card.className='card';
+ card.innerHTML='<h2>'+spec.title+'</h2><p class="desc">'+spec.desc+'</p>';
+ const current=API.get(gameId);
+ spec.fields.forEach(f=>{
+  const [path,label,min,max,step,suffix]=f;const wrap=document.createElement('div');wrap.className='group';
+  const lab=document.createElement('div');lab.className='label';
+  const left=document.createElement('span');left.textContent=label;const val=document.createElement('span');val.className='value';
+  const range=document.createElement('input');range.type='range';range.min=min;range.max=max;range.step=step;range.value=getPath(current,path);
+  const update=()=>{val.textContent=range.value+(suffix?(' '+suffix):'')};update();range.addEventListener('input',()=>{ update(); modeSelect.value='custom'; modeInfo.textContent='目前為自訂模式：你正在使用手動調整的參數。'; });
+  range.dataset.game=gameId;range.dataset.path=path;
+  lab.append(left,val);wrap.append(lab,range);card.appendChild(wrap);
+ });
+ return card;
+}
+Object.keys(specs).forEach(id=>editor.appendChild(makeGameCard(id,specs[id])));
+function updateModeInfo(){
+ const m=API.getMode();
+ modeSelect.value=m;
+ modeInfo.textContent = m==='exhibition' ? '展覽模式：目前定稿的科普展節奏與難度。' : m==='challenge' ? '挑戰模式：較嚴格的判定、較大格數與較短記憶節奏。' : '自訂模式：依滑桿調整後的參數。';
+}
+
+updateModeInfo();
+function snapshotFromUI(){
+ const out={clock:API.get('clock'),attention:API.get('attention'),memory:API.get('memory'),executive:API.get('executive')};
+ editor.querySelectorAll('input[type=range]').forEach(el=>setPath(out[el.dataset.game],el.dataset.path,Number(el.value)));
+ if(out.attention.rounds<1)out.attention.rounds=1;
+ return out;
+}
+function show(msg){status.textContent=msg;status.classList.add('show');clearTimeout(show.t);show.t=setTimeout(()=>status.classList.remove('show'),2800)}
+document.getElementById('applyModeBtn').addEventListener('click',()=>{
+ try{
+  API.setMode(modeSelect.value,{persist:true});
+  location.reload();
+ }catch(err){ show('模式無法套用：'+err.message); }
+});
+
+document.getElementById('saveBtn').addEventListener('click',()=>{
+ const next=snapshotFromUI();
+ try{
+  Object.keys(next).forEach(id=>API.setRuntime(id,next[id]));
+  API.persistAll();
+  show('設定已套用並儲存。重新進入遊戲後會使用新參數。');
+ }catch(err){show('設定無法儲存：'+err.message)}
+});
+document.getElementById('resetBtn').addEventListener('click',()=>{
+ if(!confirm('確定要把四款遊戲全部恢復預設值嗎？'))return;
+ API.resetAll();API.clearPersisted();location.reload();
+});
+})();
+</script>
+</body>
+</html>
+
+<script src="island-return.js"></script>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>心智大作戰｜語意判斷</title>
+<style>
+:root{--bg:#061a2b;--bg2:#0b3149;--panel:rgba(255,255,255,.97);--text:#17324d;--muted:#718596;--primary:#32a9e8;--teal:#55c6ad;--danger:#df5a63;--gold:#f4b942;--line:rgba(26,60,87,.12);--shadow:0 24px 60px rgba(1,18,32,.28)}
+*{box-sizing:border-box}html,body{min-height:100%;margin:0}body{font-family:"Microsoft JhengHei","微軟正黑體","Noto Sans TC",Arial,sans-serif;color:var(--text);background:radial-gradient(circle at 10% 0%,rgba(110,210,186,.2),transparent 24%),radial-gradient(circle at 90% 8%,rgba(50,169,232,.28),transparent 28%),linear-gradient(160deg,var(--bg),var(--bg2) 54%,#092238);padding:18px;user-select:none;-webkit-user-select:none;overscroll-behavior:none}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.14;background-image:radial-gradient(rgba(255,255,255,.8) .55px,transparent .55px);background-size:18px 18px}
+.topbar{width:100%;max-width:1040px;margin:0 auto 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;color:#fff;position:relative;z-index:2}.brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.06em}.brand-mark{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:25px;background:linear-gradient(145deg,#6ed2ba,#32a9e8);box-shadow:0 10px 24px rgba(0,0,0,.22)}.brand-copy small{display:block;font-size:.66rem;letter-spacing:.18em;opacity:.62}.brand-copy strong{display:block;font-size:1.02rem;margin-top:2px}.exit-btn{min-height:44px;padding:9px 15px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(255,255,255,.09);backdrop-filter:blur(10px);color:#fff;font-weight:900;cursor:pointer;touch-action:manipulation}
+.game-card{width:100%;max-width:1120px;margin:0 auto;background:var(--panel);border:1px solid rgba(255,255,255,.75);border-radius:28px;box-shadow:var(--shadow);padding:24px;position:relative;overflow:hidden}.game-card::before{content:"";position:absolute;width:340px;height:340px;right:-180px;top:-180px;border-radius:50%;background:rgba(50,169,232,.07)}
+.info{position:relative;z-index:1}.eyebrow{font-size:.7rem;letter-spacing:.2em;font-weight:900;color:#1681bb}.title-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.title-row h1{margin:0;font-size:clamp(1.7rem,4vw,2.35rem)}.tag{padding:6px 10px;border-radius:999px;background:#edf7fb;color:#39758f;font-size:.72rem;font-weight:900}.status-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}.pill{padding:7px 11px;border-radius:999px;background:#f2f7f9;color:#57717e;font-size:.78rem;font-weight:900}.pill strong{color:var(--text)}.progress{width:100%;height:10px;margin:10px 0 16px;background:#e9f0f3;border-radius:999px;overflow:hidden}.progress>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--primary),var(--teal));border-radius:999px;transition:width .25s ease}
+.instruction{padding:18px;border-radius:18px;background:linear-gradient(145deg,#f8fbfd,#eef7fa);border:1px solid #dcebf0;font-size:1.15rem;line-height:1.55;font-weight:800}.rule{display:inline-block;margin-top:8px;padding:7px 14px;border-radius:999px;background:#fff4cf;border:1px solid #ffe0a1;color:#8d6713;font-size:clamp(1.15rem,3vw,1.65rem);font-weight:1000}.tip{margin:12px 0 20px;padding:12px 15px;border-radius:16px;background:#fff8e9;border:1px solid #ffe1a1;color:#7e6732;font-size:.86rem;font-weight:700;line-height:1.55}.play{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center}.choices{width:100%;display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:16px;max-width:900px}.choice{min-height:180px;border:2px solid #dfe9ee;border-radius:22px;background:#fff;box-shadow:0 10px 24px rgba(16,63,84,.08);display:grid;place-items:center;cursor:pointer;touch-action:manipulation;transition:transform .16s,box-shadow .16s,border-color .16s}.choice:active{transform:translateY(2px)}.choice[disabled]{cursor:default;opacity:.82}.choice.good{border-color:#55c6ad;box-shadow:0 0 0 4px rgba(85,198,173,.16),0 12px 26px rgba(85,198,173,.16)}.choice.bad{border-color:#df5a63;box-shadow:0 0 0 4px rgba(223,90,99,.12)}
+.symbol{width:108px;height:108px;display:grid;place-items:center}.shape{width:80px;height:80px;display:block;filter:drop-shadow(0 8px 8px rgba(0,0,0,.12))}.circle{border-radius:50%}.square{border-radius:14px}.triangle{clip-path:polygon(50% 6%,94% 92%,6% 92%)}.diamond{clip-path:polygon(50% 4%,96% 50%,50% 96%,4% 50%)}
+.action-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}.action{min-height:52px;padding:12px 22px;border:0;border-radius:15px;font-weight:950;font-size:1rem;cursor:pointer;color:#fff;touch-action:manipulation}.primary{background:linear-gradient(135deg,#32a9e8,#1486c3)}.secondary{background:linear-gradient(135deg,#6ed2ba,#45bd9e)}.feedback{min-height:58px;width:100%;max-width:760px;margin-top:16px;padding:14px 18px;border-radius:18px;text-align:center;font-size:1.05rem;font-weight:900;display:none}.feedback.ok{display:block;background:#effaf5;border:1px solid #bee9d7;color:#1d6d51}.feedback.bad{display:block;background:#fff0f0;border:1px solid #f3c2c6;color:#98343c}.finish{width:100%;max-width:620px;text-align:center;padding:22px}.score{font-size:4rem;line-height:1;color:#1486c3;font-weight:1000;margin:12px 0}.meta{color:#607785;font-weight:800;margin-bottom:16px}.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.actions button{min-height:50px;padding:10px 18px;border:0;border-radius:14px;font-weight:900;color:#fff;cursor:pointer;touch-action:manipulation}.again{background:#32a9e8}.home{background:#45bd9e}
+.countdown{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(3,22,38,.66);backdrop-filter:blur(5px);z-index:50}.countdown.show{display:flex}.countdown-text{font-size:clamp(5rem,18vw,11rem);font-weight:1000;color:#fff;text-shadow:0 14px 40px rgba(0,0,0,.35);animation:countPop .72s ease}.countdown-go{font-size:clamp(4.2rem,15vw,9rem)}@keyframes countPop{0%{transform:scale(.62);opacity:.25}55%{transform:scale(1.06);opacity:1}100%{transform:scale(1);opacity:1}}
+@media(max-width:860px){.choices{grid-template-columns:repeat(2,minmax(140px,1fr));max-width:680px}.choice{min-height:160px}}
+@media(max-width:560px){body{padding:12px}.game-card{padding:18px;border-radius:22px}.choices{grid-template-columns:repeat(2,1fr);gap:12px}.choice{min-height:140px;border-radius:18px}.symbol{width:92px;height:92px}.shape{width:68px;height:68px}.instruction{font-size:1rem}.tip{font-size:.8rem}.status-row{justify-content:center}}
+@media(max-width:380px){.choices{gap:10px}.choice{min-height:128px}.shape{width:62px;height:62px}}
+</style>
+<link rel="stylesheet" href="brain-responsive.css">
+<link rel="stylesheet" href="brain-game-shell.css">
+<link rel="stylesheet" href="brain-design-system.css">
+<link rel="stylesheet" href="brain-viewport.css">
+<script src="brain-layout.js"></script>
+<script src="brain-games.js"></script>
+<script src="brain-audio.js"></script>
+<script src="brain-feedback.js"></script>
+<script src="brain-config.js"></script>
+<script src="brain-assets.js"></script>
+<script src="brain-interference.js"></script>
+<style>.instruction .rule{background:#fff;border-color:#d7e0ec;color:#202a46}</style>
+<script src="brain-core.js"></script>
+<link rel="stylesheet" href="brain-motion.css">
+<link rel="stylesheet" href="brain-game-theme.css">
+<link rel="stylesheet" href="brain-game-frame.css">
+</head>
+<body data-game-id="executive">
+<div class="topbar"><div class="brand"><div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></div><div class="brand-copy"><small>BRAIN CHALLENGE</small><strong>心智大作戰</strong></div></div><button class="exit-btn" onclick="exitGame()">回大廳</button></div>
+<main class="game-card"><section class="info"><div class="eyebrow">CHALLENGE 04</div><div class="title-row"><h1>語意判斷</h1><span class="tag">規則切換・抑制反應</span></div><div class="status-row"><div class="pill" id="status">進度 <strong>0 / 10</strong></div><div class="pill">本關分數 <strong id="score">0</strong></div><div class="pill">規則 <strong id="rule-pill">準備中</strong></div></div><div class="progress"><span id="progress"></span></div><div class="instruction" id="instruction">準備好挑戰你的規則切換能力了嗎？<br><span class="rule">看規則，再做判斷</span></div><div class="tip"><strong>玩法：</strong>依照上方規則，點選符合條件的圖形。下一題可能會換規則，別被上一題的判斷方式帶走。</div></section>
+<section class="play"><div class="choices" id="choices"></div><div class="game-feedback" id="game-feedback" role="status" aria-live="polite"></div><div class="action-row"><button class="action primary" id="start" onclick="startGame()">開始挑戰</button></div></section></main></div>
+<div style="max-width:1040px;margin:12px auto 0;text-align:center;color:rgba(255,255,255,.55);font-size:.75rem;font-weight:700;position:relative;z-index:2">互動科普體驗｜非醫療診斷工具</div>
+<script>
+(function(){
+'use strict';
+const CONFIG=BrainChallengeConfigAPI.getForModule('executive');
+const ASSETS=window.BrainChallengeAssets?.api;
+const COLOR_OPTIONS=(ASSETS?.get('executive')?.colors)||[];
+const SHAPE_OPTIONS=(ASSETS?.get('executive')?.shapes)||[];
+const totalRounds=Math.max(1,Number(CONFIG.rounds)||10);
+const optionsPerRound=Math.max(3,Number(CONFIG.optionsPerRound)||4);
+const switchEvery=Math.max(1,Number(CONFIG.switchEvery)||1);
+const startingRule=CONFIG.startingRule==='shape'?'shape':'color';
+const el={status:document.getElementById('status'),score:document.getElementById('score'),rule:document.getElementById('rule-pill'),progress:document.getElementById('progress'),instruction:document.getElementById('instruction'),choices:document.getElementById('choices'),feedback:document.getElementById('game-feedback'),start:document.getElementById('start'),countdown:document.getElementById('countdown'),countdownText:document.getElementById('countdown-text')};
+el.status.innerHTML=`進度 <strong>0 / ${totalRounds}</strong>`;
+let round=0,totalScore=0,roundStart=0,totalTime=0,currentRule=startingRule,currentTarget=null,locked=false;
+function exitGame(){ if(confirm('現在離開的話，目前的進度將不會被儲存喔。確定要回大廳嗎？')) BrainChallenge.navigation.goHome(); }
+function ruleForRound(index){return ((Math.floor(index/switchEvery)%2===0)?startingRule:(startingRule==='color'?'shape':'color'));}
+function shuffle(list){const a=list.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function buildChoices(rule){
+ const colors=shuffle(COLOR_OPTIONS); const shapes=shuffle(SHAPE_OPTIONS);
+ const target=rule==='color'?colors[0]:shapes[0]; const combos=[];
+ const pickedColors=shuffle(COLOR_OPTIONS).slice(0,Math.max(optionsPerRound,4));
+ const pickedShapes=shuffle(SHAPE_OPTIONS).slice(0,Math.max(optionsPerRound,4));
+ // Ensure exactly one option matches the target rule.
+ for(let i=0;i<optionsPerRound;i++){
+   let color=pickedColors[i%pickedColors.length], shape=pickedShapes[i%pickedShapes.length];
+   if(i===0){ if(rule==='color') color=target; else shape=target; }
+   if(rule==='color' && color===target && i!==0){color=pickedColors.find(c=>c!==target)||color;}
+   if(rule==='shape' && shape===target && i!==0){shape=pickedShapes.find(s=>s!==target)||shape;}
+   combos.push({color,shape,correct:i===0});
+ }
+ // Keep the selected target intact; never mutate shapes after correctness is assigned.
+ return shuffle(combos);
+
+}
+function drawChoice(item,index){const button=document.createElement('button');button.className='choice';button.type='button';button.setAttribute('aria-label',`${index+1}號選項`);button.innerHTML=`<span class="symbol"><span class="shape ${item.shape.className}" style="background:${item.color.value}"></span></span>`;button.addEventListener('click',()=>answer(item,button));return button;}
+function labelForRule(rule,target,choices){const color=BrainInterference.choose(choices);return `請找出「<span style="color:${BrainInterference.ink(color)}">${target.label}</span>」`}
+function startGame(){
+ BrainChallenge.audio?.unlock?.(); BrainChallenge.gameShell.hideFeedback();
+ round=0;totalScore=0;totalTime=0;el.score.textContent='0';el.start.style.display='none';beginRound();
+}
+function beginRound(){locked=false;roundStart=performance.now();round++;currentRule=ruleForRound(round-1);currentTarget=currentRule==='color'?COLOR_OPTIONS[0]:SHAPE_OPTIONS[0];const choices=buildChoices(currentRule);currentTarget=choices.find(x=>x.correct)[currentRule==='color'?'color':'shape'];el.status.innerHTML=`進度 <strong>${round} / ${totalRounds}</strong>`;el.rule.textContent=currentRule==='color'?'顏色':'形狀';el.progress.style.width=`${((round-1)/totalRounds)*100}%`;el.instruction.innerHTML=`現在請依照規則作答：<br><span class="rule">${labelForRule(currentRule,currentTarget,choices)}</span>`;BrainChallenge.gameShell.hideFeedback();el.choices.innerHTML='';choices.forEach((c,i)=>el.choices.appendChild(drawChoice(c,i)));}
+function answer(item,button){if(locked)return;locked=true;const elapsed=performance.now()-roundStart;totalTime+=elapsed;const correct=item.correct;let earned=correct?Number(CONFIG.scoring?.correct||100):Number(CONFIG.scoring?.wrong||0);if(!correct)earned=Math.max(0,earned);totalScore+=earned;el.score.textContent=totalScore;document.querySelectorAll('.choice').forEach(b=>b.disabled=true);button.classList.add(correct?'good':'bad');BrainChallenge.gameShell.feedback({title:correct?'判斷正確':'再看一次規則',message:correct?'規則切換成功。':'這一題抓錯規則了。',type:correct?'correct':'wrong',duration:450});el.progress.style.width=`${(round/totalRounds)*100}%`;if(round<totalRounds){beginRound();}else{finishGame();}}
+function finishGame(){const seconds=Math.max(1,Math.floor(totalTime/1000));const avgScore=Math.round(totalScore/totalRounds);el.choices.innerHTML='';el.status.innerHTML='挑戰完成';el.rule.textContent='完成';el.instruction.innerHTML=`<div class="finish"><div style="font-size:1.55rem;font-weight:1000">本關完成</div><div>你的執行功能・認知彈性挑戰結果</div><div class="score">${avgScore}</div><div class="meta">平均得分 ・ 作答時間 ${seconds} 秒</div><div class="actions"><button class="again" onclick="location.reload()">再挑戰一次</button><button class="home" onclick="BrainChallenge.navigation.goHome()">回到大廳</button></div></div>`;const record={gameName:'語意判斷',playerName:BrainChallenge.player.getName(),score:avgScore,totalSeconds:seconds,timeText:`${seconds}秒`,age:BrainChallenge.player.getAge(),timestamp:new Date().toLocaleString()};BrainChallenge.scores.save(record);BrainChallenge.audio?.play?.('complete');}
+window.startGame=startGame;
+window.exitGame=exitGame;
+})();
+</script>
+<script src="brain-viewport.js"></script>
+</body>
+</html>
+
+<script src="island-integration.js"></script>

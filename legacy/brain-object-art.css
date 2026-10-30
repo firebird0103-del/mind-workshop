@@ -1,0 +1,18 @@
+/* PNG artwork in individual SVG viewports. No replacement vector drawings. */
+.object-art.visual-symbol {
+  display:block; flex:none; aspect-ratio:1; width:100%; height:auto;
+  background-color:#fff;
+  pointer-events:none;
+}
+body[data-game-id="memory"] .object-art.visual-symbol { width:94%; height:94%; border-radius:8px; }
+body[data-game-id="memory"] #display-area .object-art { width:100%; height:100%; border-radius:12px; }
+body[data-game-id="memory"] .answer-reveal {display:flex;flex-wrap:wrap;justify-content:center;gap:10px;padding:0;list-style:none;margin:12px 0 0;}
+body[data-game-id="memory"] .answer-reveal li {width:90px;background:#fff;border:1px solid #c5dfd7;border-radius:10px;padding:4px;color:#17324d;font-size:14px;}
+body[data-game-id="memory"] .answer-reveal .object-art {width:80px;height:80px;}
+body[data-game-id="memory"] .slot:focus-visible,
+body[data-game-id="memory"] .option-btn:focus-visible {outline:3px solid #1769e0;outline-offset:3px;}
+body[data-game-id="memory"] button:disabled {cursor:default;}
+body[data-game-id="memory"] #btn-start:disabled {opacity:.6;}
+body[data-game-id="memory"] .slot:disabled {opacity:1;}
+body[data-game-id="memory"] .game-layout {grid-template-columns:minmax(240px,320px) minmax(0,1fr);}
+@media(max-width:900px) {body[data-game-id="memory"] .game-layout {grid-template-columns:1fr;}}

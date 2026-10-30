@@ -1,0 +1,39 @@
+/* v10.6: countdown and timed images share a stable viewing centre.
+ * Scoped to the showing phase; answering/review/results keep their layout. */
+body[data-game-id="memory"][data-phase="showing"] .memory-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+body[data-game-id="memory"][data-phase="showing"] .sequence-label {
+  grid-area: 1 / 1;
+}
+
+body[data-game-id="memory"][data-phase="showing"] #display-area {
+  grid-area: 2 / 1;
+  max-width: 100%;
+}
+
+body[data-game-id="memory"][data-phase="showing"] .memory-countdown {
+  position: relative;
+  inset: auto;
+  grid-area: 2 / 1;
+  align-self: stretch;
+  justify-self: stretch;
+}
+
+/* Wide, sufficiently tall screens have room for the approved presentation
+ * height. Bias the label+image group slightly upward so the image itself is
+ * near the centre of the stage. On small/short screens no height is reserved. */
+@media (min-width: 821px) and (min-height: 700px) {
+  body[data-game-id="memory"][data-phase="showing"] .memory-stage {
+    min-height: 68svh;
+    display: grid;
+    align-items: center;
+    padding-block: 16px 44px;
+  }
+}

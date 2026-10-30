@@ -1,0 +1,226 @@
+/* v10.2 · Warm playground palette for existing game pages.
+ * Only backgrounds, UI colours and the brand drawing are themed here.
+ * Task artwork, clock hands, interference ink and all layout rules stay intact.
+ */
+html {
+  background: radial-gradient(ellipse at 50% 36%, #fffdf8 0%, #fff9ee 58%, #ffefd4 100%);
+  background-attachment: fixed;
+}
+body[data-game-id] {
+  --playground-paper: #fffcf6;
+  --playground-muted: #796b61;
+  --playground-line: #efd7bc;
+  --bc-line: var(--playground-line);
+  --bc-muted: var(--playground-muted);
+  --bc-shadow: 0 10px 28px rgba(119, 72, 28, .10);
+  background: radial-gradient(ellipse at 50% 36%, #fffdf8 0%, #fff9ee 58%, #ffefd4 100%) !important;
+  background-attachment: fixed !important;
+}
+body[data-game-id]::before {
+  opacity: .65 !important;
+  background-image: radial-gradient(#dcc9ae .65px, transparent .65px) !important;
+}
+body[data-game-id="clock"] {
+  --station-colour: #0868ef;
+  --station-ink: #075bd1;
+  --station-soft: #edf4ff;
+  --station-line: #c8d9f0;
+  --station-selection: #8fb5ee;
+  --station-button-ink: #ffffff;
+}
+body[data-game-id="attention"] {
+  --station-colour: #ff5d61;
+  --station-ink: #b63843;
+  --station-soft: #fff0eb;
+  --station-line: #efc8bb;
+  --station-selection: #ef9694;
+  --station-button-ink: #10284e;
+}
+body[data-game-id="memory"] {
+  --station-colour: #ffc318;
+  --station-ink: #89620a;
+  --station-soft: #fff7d9;
+  --station-line: #ead799;
+  --station-selection: #d9ac3d;
+  --station-button-ink: #10284e;
+}
+body[data-game-id="executive"] {
+  --station-colour: #009fa9;
+  --station-ink: #00777f;
+  --station-soft: #eaf7f2;
+  --station-line: #bbdcd2;
+  --station-selection: #74bbb7;
+  --station-button-ink: #10284e;
+}
+
+/* Keep the original mark's occupied space, including the attention grid.
+ * Hidden spans still determine its dimensions; the mascot replaces its drawing.
+ */
+body[data-game-id] .brand-mark {
+  position: relative;
+  overflow: visible !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+body[data-game-id] .brand-mark span { visibility: hidden !important; }
+body[data-game-id] .brand-mark::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("assets/yunyun-logo.png") center / contain no-repeat;
+  filter: drop-shadow(.5px 0 0 #fff) drop-shadow(-.5px 0 0 #fff)
+          drop-shadow(0 .5px 0 #fff) drop-shadow(0 -.5px 0 #fff)
+          drop-shadow(0 1.5px 1.5px rgba(119, 69, 37, .22));
+}
+body[data-game-id] .brand-copy small,
+body[data-game-id] .footer-note,
+body[data-game-id="executive"] > .game-card + div { color: var(--playground-muted) !important; }
+body[data-game-id] .exit-btn {
+  background: var(--playground-paper) !important;
+  border-color: var(--playground-line) !important;
+}
+body[data-game-id] button:focus-visible,
+body[data-game-id] [role="button"]:focus-visible { outline-color: var(--station-ink); }
+
+body[data-game-id] .game-card,
+body[data-game-id="attention"] .info-area,
+body[data-game-id="attention"] .final-panel {
+  background: var(--playground-paper) !important;
+  border-color: var(--playground-line) !important;
+}
+body[data-game-id] .eyebrow { color: var(--station-ink) !important; }
+body[data-game-id] .game-tag,
+body[data-game-id] .tag {
+  background: var(--station-soft) !important;
+  color: var(--station-ink) !important;
+}
+body[data-game-id] .status-pill,
+body[data-game-id] .pill {
+  background: #f5efe5 !important;
+  color: var(--playground-muted) !important;
+}
+body[data-game-id] .score-pill { background: var(--station-soft) !important; }
+body[data-game-id] .game-progress,
+body[data-game-id] .progress {
+  background: #eee3d1;
+  box-shadow: inset 0 1px 2px rgba(119, 72, 28, .08);
+}
+body[data-game-id] .game-progress > span,
+body[data-game-id] .progress > span { background: var(--station-colour) !important; }
+body[data-game-id] .instruction {
+  background: var(--station-soft) !important;
+  border-color: var(--station-line) !important;
+}
+body[data-game-id] .tips,
+body[data-game-id] .tip,
+body[data-game-id] .micro-notice {
+  background: #fff4df !important;
+  border-color: #ecd2a8 !important;
+  color: #795b2e !important;
+}
+
+/* Coloured UI actions. Correct/wrong feedback retains its existing semantics. */
+body[data-game-id] #btn-start,
+body[data-game-id] #btn-next,
+body[data-game-id] #btn-submit,
+body[data-game-id] .action.primary,
+body[data-game-id] .main-action-btn:not(.secondary),
+body[data-game-id] .again {
+  background: var(--station-colour) !important;
+  color: var(--station-button-ink) !important;
+}
+body[data-game-id] .home,
+body[data-game-id] .secondary {
+  background: #efe6d7 !important;
+  color: #10284e !important;
+}
+body[data-game-id] .score-big,
+body[data-game-id] .score { color: var(--station-ink) !important; }
+body[data-game-id] .finish-meta,
+body[data-game-id] .meta { color: var(--playground-muted); }
+body[data-game-id] .game-feedback {
+  background: rgba(255, 252, 246, .97);
+  border-color: var(--playground-line);
+  box-shadow: 0 18px 46px rgba(119, 72, 28, .22);
+}
+body[data-game-id] .feedback-copy span { color: var(--playground-muted); }
+body[data-game-id] .feedback-info .feedback-icon { background: var(--station-ink); }
+
+/* Clock: warm the stage, preserve the actual dial, numbers and hands. */
+body[data-game-id="clock"] .clock-stage {
+  background: #fff6e7 !important;
+  box-shadow: inset 0 0 0 1px var(--playground-line) !important;
+}
+body[data-game-id="clock"] .clock-stage::before { border-color: #e7ceb0 !important; }
+body[data-game-id="clock"] .bc-game-hint {
+  background: #fff7e9;
+  border-color: var(--playground-line);
+  color: var(--playground-muted);
+}
+
+/* Attention: keep A/B distinction and all object sprites unchanged. */
+body[data-game-id="attention"] .instruction small,
+body[data-game-id="attention"] .grid-title small,
+body[data-game-id="attention"] .round-hint,
+body[data-game-id="attention"] .ready-panel p { color: var(--playground-muted); }
+body[data-game-id="attention"] .target-count { color: var(--station-ink); }
+body[data-game-id="attention"] .ready-panel {
+  background: #fff2e8;
+  border-color: var(--station-line);
+}
+body[data-game-id="attention"] .ready-art > span {
+  background: #fffdf8;
+  box-shadow: 0 6px 0 #efc9b8;
+}
+body[data-game-id="attention"] .grid-wrapper {
+  background: #fffdf8;
+  border-color: var(--station-line);
+  border-top-color: #eea094;
+  box-shadow: 0 8px 22px rgba(119, 72, 28, .06);
+}
+body[data-game-id="attention"] .target-board { border-top-color: var(--station-colour); }
+body[data-game-id="attention"] .board-badge {
+  background: #fff1e4;
+  color: var(--station-ink);
+}
+body[data-game-id="attention"] .target .board-badge { background: #ffe3dd; }
+body[data-game-id="attention"] .grid-area { background: #f6ecdf; }
+body[data-game-id="attention"] .target-board .grid-area { background: #fce6de; }
+body[data-game-id="attention"] .cell:not(.found):not(.wrong) { border-color: #e8dccb; }
+body[data-game-id="attention"] button.cell:hover:not(:disabled):not(.found):not(.wrong) {
+  border-color: var(--station-ink);
+  box-shadow: inset 0 0 0 1px var(--station-ink);
+}
+
+/* Memory: only the surrounding tray and UI selection highlights are recoloured. */
+body[data-game-id="memory"] .memory-stage {
+  background: #fff5dc !important;
+  box-shadow: inset 0 0 0 1px var(--station-line) !important;
+}
+body[data-game-id="memory"] #display-area {
+  background: #fffdf8 !important;
+  border-color: var(--playground-line) !important;
+}
+body[data-game-id="memory"] .slot:not([data-filled="true"]),
+body[data-game-id="memory"] .option-btn:not(.selected) { border-color: #e7d9bd; }
+body[data-game-id="memory"] .slot[data-filled="true"],
+body[data-game-id="memory"] .option-btn.selected {
+  background: var(--station-soft);
+  border-color: var(--station-selection);
+  box-shadow: 0 8px 20px rgba(190, 139, 20, .12);
+}
+body[data-game-id="memory"] .slot::after,
+body[data-game-id="memory"] .sequence-label { color: var(--playground-muted); }
+body[data-game-id="memory"] .instruction .target-count,
+body[data-game-id="memory"] .countdown-text { color: var(--station-ink); }
+body[data-game-id="memory"] .countdown-text.go { color: #258776; }
+
+/* Executive: never override .shape background or .rule span interference ink. */
+body[data-game-id="executive"] .instruction .rule {
+  background: #fffdf8;
+  border-color: var(--playground-line);
+}
+body[data-game-id="executive"] .choice:not(.good):not(.bad) {
+  background: #fffdf8;
+  border-color: var(--playground-line);
+}
