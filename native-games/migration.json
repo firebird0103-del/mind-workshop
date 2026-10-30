@@ -1,0 +1,29 @@
+{
+  "baseline": "Fix4 / 2.6.4",
+  "files": {
+    "time": {
+      "html": "clock_game.html",
+      "script": "clock_game.html",
+      "sourceScriptSha256": "aba7151fb1c4fc66f82ecc235adcaac987b1e6d51276ad22b444179b4e0c3c8d",
+      "module": "clock"
+    },
+    "spot": {
+      "html": "find_diff_game.html",
+      "script": "attention-game.js",
+      "sourceScriptSha256": "5bd031a02e397cccb7da7012d91adec81d025f64d434ae57aa2a6896c3801c1d",
+      "module": "attention"
+    },
+    "memory": {
+      "html": "memory_game_hard.html",
+      "script": "memory-game.js",
+      "sourceScriptSha256": "5578be6634ef9e3235f2b494e5de13b2f14edd42ff909945133ff9337faad17a",
+      "module": "memory"
+    },
+    "switch": {
+      "html": "shape_color_game.html",
+      "script": "shape_color_game.html",
+      "sourceScriptSha256": "65913bb4fd9bb10a165148e002b7e799ed7756f5e194fc8df49e7558d2df1f5f",
+      "module": "executive"
+    }
+  }
+}

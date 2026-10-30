@@ -1,0 +1,215 @@
+:host{display:block;height:100%;font-family:"Microsoft JhengHei","微軟正黑體",sans-serif;--text:#44372b;--ink:#44372b;--muted:#7e6c55;--primary:var(--studio);--primary2:#b49767;--blue:var(--studio);--teal:#6f8759;--line:#ddceb6;--panel:#fffdf7;--shadow:none;--canvas:#fbf6ec;color:var(--text);font-size:16px}
+*{box-sizing:border-box}[hidden]{display:none!important}
+.game-root{height:100%;min-height:0;margin:0;padding:0!important;background:none!important;color:var(--text);font:inherit;user-select:none;-webkit-user-select:none;touch-action:manipulation;--rail:clamp(230px,22%,330px)}
+.game-root::before,.game-card::before{display:none!important}
+button{font-family:inherit;cursor:pointer;touch-action:manipulation}button:focus-visible{outline:3px solid #936d30;outline-offset:3px}button:disabled{cursor:default}
+.game-card{width:100%;height:100%;min-height:0;max-width:none;margin:0;padding:14px;border:1px solid #e1d3bd;border-radius:13px;background:#fffdf7;box-shadow:none;overflow:visible}
+.game-layout{display:grid;height:100%;grid-template-columns:var(--rail) minmax(0,1fr);gap:var(--game-gap,20px);align-items:stretch;min-width:0;min-height:0}
+.info-area,.info{display:flex;flex-direction:column;align-items:stretch;gap:14px;min-width:0;min-height:0;height:100%;text-align:left}
+.play-area,.play{min-width:0;min-height:0;width:100%;height:100%}
+.game-root .eyebrow,.game-root .title-row,.game-root .title-group{display:none}
+.game-hud{width:100%;display:grid;gap:8px;flex:none}.game-hud-row{display:block}
+.status-row{display:flex;gap:7px;flex-wrap:wrap;margin:0;font-size:15px}
+.status-pill,.pill{background:#f1e9da;color:#6f5b43;font-size:15px;white-space:normal;padding:8px 11px;border-radius:10px}
+.status-pill strong,.pill strong{color:#493b2d}
+.instruction{width:100%;margin:0;background:#f5ecdc;border:1px solid #dfcdb1;color:#493b2d;border-radius:12px;font-size:clamp(17px,1.25vw,22px);padding:17px;line-height:1.6;flex:none}
+.instruction .target-time,.instruction .target-count,.target-count,.score-big,.score,.countdown-text{color:var(--studio)}
+.instruction .target-time{font-size:clamp(30px,2.7vw,48px);letter-spacing:.03em;line-height:1.4;margin-top:10px}
+.instruction small,.ready-panel p,.round-hint,.grid-title small{color:#7a6953}
+.tips,.tip{background:#faf3e5;border:1px solid #e9d7af;color:#7d6540;font-size:14px;padding:12px;line-height:1.65;margin:0;border-radius:12px;flex:none}
+.game-progress,.progress{width:100%;background:#e9dfcd;border-radius:99px;overflow:hidden;height:6px;flex:none;margin:0}
+.game-progress>span,.progress>span{display:block;background:var(--studio);height:100%;width:0}
+.main-action-btn,.action.primary,.again,.finish-actions button.again,.actions button.again{background:var(--studio)!important;color:#fff!important;font-size:19px;min-height:50px;border:0;border-radius:11px;font-weight:900;box-shadow:0 3px 0 #62482a30;letter-spacing:.03em;padding:12px 20px;max-width:none}
+.home,.finish-actions .secondary,.finish-actions button.home,.actions button.home{background:#74614b!important;color:#fff!important;font-size:17px;min-height:50px;border:0;border-radius:11px;padding:12px 20px;font-weight:800}
+.btn-group,.memory-actions{width:100%;display:flex;flex-direction:column;gap:8px;margin-top:auto;flex:none}.btn-group button,.memory-actions button{width:100%}
+
+/* Task rail, full-height clock. Result and controls never push the dial down. */
+.game-root[data-game-id="clock"] .play-area{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px}
+.clock-stage{flex:none;aspect-ratio:1;width:var(--clock-size,460px);height:var(--clock-size,460px);max-width:100%;max-height:none;border-radius:18px;background:radial-gradient(circle,#fffef9 0 68%,#efe1c9 69%);box-shadow:inset 0 0 0 1px #d9c39f}
+.clock-stage::before{inset:3%;border-color:#d6c6aa}
+.clock-container{width:92%;max-width:none;border:7px solid #65503a;box-shadow:0 7px 18px #6445261a,inset 0 0 0 4px #f2e8d8}
+.clock-container::after,.hour-hand{background:#65503a}.minute-hand{background:var(--studio)}
+.number{font-size:clamp(16px,calc(var(--clock-size,460px)*.039),30px);color:#715c43}
+.bc-game-hint{font-size:13px;color:#8b765e;flex:none;line-height:20px;text-align:center}
+.game-root[data-game-id="clock"][data-phase="ready"] .clock-container{display:block!important;opacity:.55;pointer-events:none}
+.result-board,#result-board{background:#eff3e5;border:1px solid #ccd6b5;color:#566c3e;border-radius:12px;padding:13px;line-height:1.6;font-size:17px;flex:none}
+#result-board [style*="color:#1486c3"]{color:var(--studio)!important}
+.game-root[data-game-id="clock"] #result-board{font-size:17px;text-align:left}
+
+/* Centered comparison boards: square cells with bounded visual size. */
+.game-root.attention-page .game-card{display:grid;grid-template-rows:auto minmax(0,1fr);gap:10px;padding:10px}
+.game-root.attention-page .info-area{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:16px;width:100%;max-width:none;height:auto;margin:0;padding:10px 14px;background:#faf5e9;border:1px solid #dfceb4;border-radius:10px}
+.game-root.attention-page .info-area .instruction{flex:1 1 auto;min-width:0;font-size:20px;border:0;padding:0;background:none;line-height:1.4}
+.game-root.attention-page .instruction small{font-size:13px;margin:4px 0 0;display:block}
+.game-root.attention-page .info-area .game-hud{flex:0 0 auto;width:auto;min-width:220px}
+.game-root.attention-page .play-area{display:flex;flex-direction:column;justify-content:center}
+.game-root.attention-page .find-stage{height:100%;min-height:0;display:grid;grid-template-rows:minmax(0,1fr) auto;gap:8px;width:100%}
+.grid-pair{width:100%;max-width:100%;height:100%;min-height:0;margin:auto;align-self:center;display:grid;gap:14px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid-wrapper{min-width:0;min-height:0;height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);gap:6px;padding:8px;border:1px solid #d4bd93;border-top:4px solid var(--studio);border-radius:12px;box-shadow:none;background:#fffdf8}
+.target-board{border-color:#d5c49f;border-top-color:#796347}
+.grid-title{display:flex;align-items:center;gap:9px;margin:0;min-height:28px}.grid-title h2{font-size:18px;margin:0;white-space:nowrap}.grid-title small{font-size:12px;margin-left:auto}
+.board-badge{background:#f0e6cc;color:#82642c;width:28px;height:28px;border-radius:7px}
+.grid-scroll{min-height:0;overflow:visible;border-radius:8px}
+.grid-area{width:100%;height:100%;min-height:0;min-width:0!important;aspect-ratio:auto!important;padding:5px;background:#ede6d7;display:grid;grid-template-columns:repeat(var(--grid-size),minmax(0,1fr));grid-template-rows:repeat(var(--grid-size),minmax(0,1fr));gap:5px;border-radius:8px}
+.target-board .grid-area{background:#f0e5cb}
+.cell{min-width:0;min-height:0;aspect-ratio:auto;border:1px solid #e3d8c6;border-radius:8px;padding:2px;display:grid;place-items:center;overflow:hidden}
+.cell .object-art.visual-symbol{width:82%;height:82%;max-width:var(--attention-art-max,94px);max-height:var(--attention-art-max,94px);min-height:0;aspect-ratio:auto}.cell.wrong{border-color:#bc4d44}
+.round-footer{width:100%;max-width:none;min-height:48px;margin:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 4px}
+.round-hint{font-size:14px;margin:0}
+.round-footer .main-action-btn{width:auto;min-width:170px;min-height:46px;padding:9px 18px;font-size:17px}
+.round-footer .result-board{padding:6px 10px;font-size:15px}
+.ready-panel{width:100%;height:100%;max-width:none;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;background:#f3ebdc;border:1px solid #ddceb5;border-radius:12px}
+.ready-art{display:flex;justify-content:center;gap:25px;margin:0;flex:none}.ready-art>span{width:clamp(80px,10vw,165px);box-shadow:0 4px 0 #ddceb6;padding:8px}
+.ready-panel h2{font-size:28px;color:#55412e;margin:0}.ready-panel p{font-size:17px;line-height:1.6;margin:0;color:#7a6953}.ready-panel .main-action-btn{max-width:330px}
+.final-panel{width:100%;max-width:650px;margin:auto;padding:24px;background:#fffdf8;border:1px solid #decdb2;border-radius:16px;text-align:center}
+
+/* Stable viewing centre with comfortable, bounded image sizes. */
+.game-root[data-game-id="memory"] .game-layout{grid-template-columns:var(--rail) minmax(0,1fr)}
+.memory-stage{width:100%;height:100%;min-height:0;padding:16px;border-radius:16px;background:#f5efdf;box-shadow:inset 0 0 0 1px #dfceb2;display:flex}.memory-stage::before{display:none}
+.memory-content{width:100%;height:100%;min-height:0;display:flex;flex-direction:column;align-items:center;gap:10px}
+.sequence-label{font-size:17px;line-height:24px;color:#7d674d;flex:none}
+.game-root[data-game-id="memory"] #display-area{width:var(--memory-display-size,300px);height:var(--memory-display-size,300px);max-width:100%;border:2px solid #d8c5a6;box-shadow:0 8px 22px #5d42251a;border-radius:18px}
+.game-root[data-game-id="memory"][data-phase="showing"] .memory-stage{min-height:0;padding:16px;display:flex;align-items:stretch}
+.game-root[data-game-id="memory"][data-phase="showing"] .memory-content{display:grid;grid-template-rows:24px minmax(0,1fr);grid-template-columns:minmax(0,1fr);align-items:center;justify-items:center;gap:10px}
+.game-root[data-game-id="memory"][data-phase="showing"] .sequence-label{grid-area:1/1}
+.game-root[data-game-id="memory"][data-phase="showing"] #display-area{grid-area:2/1}
+.game-root[data-game-id="memory"][data-phase="showing"] .memory-countdown{grid-area:2/1;position:relative;inset:auto;align-self:center;justify-self:center;width:var(--memory-display-size,300px);height:var(--memory-display-size,300px);border-radius:18px}
+.countdown-text{font-size:clamp(70px,calc(var(--memory-display-size,300px)*.42),200px);text-shadow:none}
+.game-root[data-game-id="memory"] #answer-area{width:100%;flex:none;gap:22px 8px;padding-bottom:18px;min-height:0}
+.game-root[data-game-id="memory"] .slot{width:var(--memory-slot-size,70px);height:var(--memory-slot-size,70px);min-height:44px;flex:none;border-color:#d6c5aa;border-radius:12px;padding:2px}
+.game-root[data-game-id="memory"] #options-area{width:100%;max-width:none;min-height:0;flex:1;align-content:center;justify-content:center;grid-template-columns:repeat(var(--memory-cols,5),var(--memory-cell,80px));grid-auto-rows:var(--memory-cell,80px);gap:8px}
+.game-root[data-game-id="memory"] .option-btn{width:var(--memory-cell,80px);height:var(--memory-cell,80px);max-width:none;min-width:0;min-height:44px;aspect-ratio:1;justify-self:center;border:2px solid #deceb5;border-radius:13px;padding:4px}
+.game-root[data-game-id="memory"] .micro-notice:not(.is-visible){display:none}
+.game-root[data-game-id="memory"] .micro-notice.is-visible{flex:none;font-size:14px;padding:8px}
+.game-root[data-game-id="memory"] .answer-reveal{gap:10px;margin:12px 0 0}
+.game-root[data-game-id="memory"] .answer-reveal li{width:clamp(65px,8vw,110px);border-color:#d6c5aa;font-size:13px}
+.game-root[data-game-id="memory"] .answer-reveal .object-art{width:100%;height:auto;aspect-ratio:1}
+#memoryReadyArt{display:flex;gap:22px;align-items:center;justify-content:center;width:100%;height:100%;padding:14px}
+#memoryReadyArt>span{width:clamp(60px,13vw,180px);padding:8px;background:#fff;border-radius:16px;box-shadow:0 5px 0 #dfceb3;transform:rotate(-4deg)}
+#memoryReadyArt>span:nth-child(2){transform:translateY(-10px) rotate(3deg)}
+.game-root:not([data-phase="ready"]) #memoryReadyArt{display:none}
+
+/* Four choices in one horizontal row, with breathing room around the cards. */
+.game-root[data-game-id="executive"] .game-card{display:grid;grid-template-columns:var(--rail) minmax(0,1fr);gap:var(--game-gap,20px);align-items:stretch}
+.game-root[data-game-id="executive"] .play{display:flex;flex-direction:column;gap:20px;align-items:center;justify-content:center}
+.game-root[data-game-id="executive"] .choices{max-width:100%;width:100%;min-height:0;flex:none;height:var(--choice-size,180px);display:grid;grid-template-columns:repeat(var(--choice-cols,4),var(--choice-size,180px));grid-template-rows:var(--choice-size,180px);justify-content:center;gap:12px;margin:0}
+.choice{width:100%;height:100%;min-width:0;min-height:0;padding:10px;border:2px solid #d9cbb7;border-radius:16px;box-shadow:0 4px 0 #e5d8c4;background:#fff;display:grid;place-items:center}
+.symbol{width:var(--shape-size,100px);height:var(--shape-size,100px)}.shape{width:100%;height:100%}.choice-preview{opacity:.55;pointer-events:none}
+.action-row{margin:0;flex:none;justify-content:center;width:min(100%,320px)}.action-row .action{width:100%}
+.action-row:has(#start[style*="display: none"]){display:none}
+.rule{display:inline-block;background:#fffdf7;border:1px solid #d9c9ad;padding:8px 12px;margin-top:10px;border-radius:12px;font-size:clamp(24px,2vw,34px);line-height:1.5}
+
+/* Single central result: no duplicate finish panels or empty play area. */
+.game-root[data-phase="finished"] .game-layout,.game-root[data-game-id="executive"][data-phase="finished"] .game-card{display:flex;align-items:center;justify-content:center}
+.game-root[data-phase="finished"] .tips,.game-root[data-phase="finished"] .tip,.game-root[data-phase="finished"] .game-hud,.game-root[data-phase="finished"] .bc-game-hint{display:none}
+.game-root[data-game-id="clock"][data-phase="finished"] .info-area{width:min(100%,650px);height:auto;gap:0}
+.game-root[data-game-id="clock"][data-phase="finished"] .instruction,.game-root[data-game-id="clock"][data-phase="finished"] .btn-group,.game-root[data-game-id="clock"][data-phase="finished"] .play-area{display:none}
+.game-root[data-game-id="clock"][data-phase="finished"] #result-board{text-align:center;width:100%;padding:24px;font-size:19px}
+.game-root[data-game-id="memory"][data-phase="finished"] .info-area{display:none}
+.game-root[data-game-id="memory"][data-phase="finished"] .play-area{height:auto;width:min(100%,750px)}
+.game-root[data-game-id="memory"][data-phase="finished"] .memory-stage,.game-root[data-game-id="memory"][data-phase="finished"] .memory-content{height:auto}
+.game-root[data-game-id="memory"][data-phase="finished"] #result-board{width:100%}
+.game-root[data-game-id="attention"][data-phase="finished"] .game-card{grid-template-rows:minmax(0,1fr)}
+.game-root[data-game-id="attention"][data-phase="finished"] .info-area{display:none}
+.game-root[data-game-id="executive"][data-phase="finished"] .info{width:min(100%,700px);height:auto}
+.game-root[data-game-id="executive"][data-phase="finished"] .status-row,.game-root[data-game-id="executive"][data-phase="finished"] .progress,.game-root[data-game-id="executive"][data-phase="finished"] .play{display:none}
+.game-root[data-game-id="executive"][data-phase="finished"] .instruction{display:grid;place-items:center;padding:18px}
+.finish{padding:8px;max-width:none;width:100%}
+.finish-actions,.actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:18px}
+.score-big,.score{font-size:clamp(48px,7vh,80px);line-height:1.2;margin:12px 0}
+
+.game-feedback{position:fixed;right:18px;bottom:16px;z-index:20;display:none;max-width:min(440px,calc(100% - 36px));padding:12px 16px;background:#fffaf0;color:#57442f;border:1px solid #c4ab84;border-left:5px solid var(--studio);border-radius:12px;box-shadow:0 10px 36px #35251326;pointer-events:none;font-size:15px}
+.game-feedback.is-visible{display:grid;gap:3px}.game-feedback span{font-size:13px}.score-bump{animation:score-pop .4s ease}
+@keyframes score-pop{40%{transform:scale(1.07)}100%{transform:none}}
+
+/* Portrait: task above interaction. Preserve usable minimums on tiny screens. */
+.game-root[data-orientation="portrait"] .game-layout{display:flex;flex-direction:column;gap:9px}
+.game-root[data-orientation="portrait"] .info-area{height:auto;gap:8px;flex:none}
+.game-root[data-orientation="portrait"] .tips,.game-root[data-orientation="portrait"] .tip{display:none}
+.game-root[data-orientation="portrait"] .instruction{font-size:16px;padding:10px 12px;line-height:1.45}
+.game-root[data-orientation="portrait"] .instruction .target-time{font-size:29px;margin-top:3px}
+.game-root[data-orientation="portrait"] .game-hud{gap:5px}
+.game-root[data-orientation="portrait"] .status-pill,.game-root[data-orientation="portrait"] .pill{font-size:13px;padding:6px 9px}
+.game-root[data-orientation="portrait"] .play-area{flex:1}
+.game-root[data-orientation="portrait"] .btn-group,.game-root[data-orientation="portrait"] .memory-actions{margin-top:0}
+.game-root[data-orientation="portrait"] .main-action-btn{min-height:44px;font-size:17px;padding:9px 15px}
+.game-root[data-orientation="portrait"] .memory-stage{padding:9px}
+.game-root[data-orientation="portrait"] .sequence-label{font-size:14px;line-height:20px}
+.game-root[data-orientation="portrait"] .memory-content{gap:7px}
+.game-root[data-orientation="portrait"] .memory-actions:has(#btn-start[style*="display: none"]):not(:has(#btn-submit[style*="display: block"])):not(:has(#btn-next[style*="display: block"])){display:none}
+.game-root[data-game-id="executive"][data-orientation="portrait"] .game-card{display:flex;flex-direction:column;gap:10px}
+.game-root[data-game-id="executive"][data-orientation="portrait"] .info{height:auto;gap:8px;flex:none}
+.game-root[data-game-id="executive"][data-orientation="portrait"] .rule{font-size:24px;line-height:1.3;margin-top:4px;padding:6px 10px}
+.game-root[data-game-id="executive"][data-orientation="portrait"] .play{flex:1}
+.game-root.attention-page[data-orientation="portrait"] .info-area{flex-direction:column;align-items:stretch;gap:7px;padding:8px 10px}
+.game-root.attention-page[data-orientation="portrait"] .info-area .game-hud{width:100%;min-width:0;flex:auto}
+.game-root.attention-page[data-orientation="portrait"] .instruction{font-size:17px}
+.game-root.attention-page[data-orientation="portrait"] .instruction small{display:none}
+.game-root.attention-page[data-orientation="portrait"] .round-footer{min-height:42px;flex-wrap:nowrap}
+.game-root.attention-page[data-orientation="portrait"] .round-hint{font-size:11px;line-height:1.5}
+.game-root.attention-page[data-orientation="portrait"] .round-footer .main-action-btn{min-width:120px;width:auto;font-size:14px;padding:8px 12px}
+.game-root.attention-page[data-orientation="portrait"] .info-area{padding:6px 8px;gap:5px}
+.game-root.attention-page[data-orientation="portrait"] .status-pill{padding:4px 8px;line-height:1.2}
+.game-root.attention-page[data-orientation="portrait"] .game-hud{gap:4px}
+.game-root.attention-page[data-orientation="portrait"] .game-progress{height:4px}
+.game-root[data-boards="column"] .grid-title{min-height:24px}.game-root[data-boards="column"] .grid-title h2{font-size:15px}.game-root[data-boards="column"] .grid-title small{font-size:11px}.game-root[data-boards="column"] .board-badge{height:24px;width:24px}
+@container(max-width:520px){.game-card{padding:9px;border-radius:10px}.game-root.attention-page .game-card{padding:5px;gap:7px}.ready-panel{padding:14px;gap:10px}.ready-art{gap:12px}.ready-art>span{width:70px}.ready-panel h2{font-size:22px}.ready-panel p{font-size:14px}.finish-actions,.actions{gap:8px}.finish-actions button,.actions button{font-size:16px;min-height:44px;padding:9px 14px}.grid-wrapper{padding:6px;gap:5px}.grid-pair{gap:10px}}
+.game-root[data-layout="scroll"]{height:auto;min-height:100%}
+.game-root[data-layout="scroll"] .game-card{height:auto;min-height:100%}
+.game-root[data-layout="scroll"] .game-layout{height:auto;min-height:100%}
+.game-root[data-layout="scroll"] .play-area{min-height:220px}
+.game-root[data-game-id="attention"][data-layout="scroll"] .find-stage{min-height:var(--attention-min-height,550px)}
+.game-root[data-game-id="memory"][data-layout="scroll"] .memory-stage{min-height:calc(var(--memory-grid-height,250px) + 150px)}
+@media(max-height:720px) and (min-width:720px){
+ .game-card{padding:10px}.info-area,.info{gap:10px}.instruction{padding:12px;font-size:17px}.tips,.tip{padding:10px;font-size:13px}
+ .game-root.attention-page .game-card{padding:7px;gap:8px}.game-root.attention-page .info-area{padding:7px 10px}
+ .game-root.attention-page .info-area .instruction{font-size:18px}.game-root.attention-page .instruction small{display:none}
+ .round-footer{min-height:44px}.grid-title{min-height:24px}.board-badge{height:24px;width:24px}.grid-title h2{font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+
+.game-root[data-game-id="executive"]:not([data-phase="finished"]) .game-card{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+.game-root[data-game-id="executive"]:not([data-phase="finished"]) .info{height:auto;display:grid;grid-template-columns:minmax(180px,.8fr) minmax(240px,1.2fr) minmax(180px,1fr);grid-template-rows:auto auto;align-items:center;gap:8px 20px}
+.game-root[data-game-id="executive"] .info>.status-row{grid-column:1;grid-row:1}
+.game-root[data-game-id="executive"] .info>.progress{grid-column:1;grid-row:2}
+.game-root[data-game-id="executive"] .info>.instruction{grid-column:2;grid-row:1/3;font-size:17px;padding:12px 16px}
+.game-root[data-game-id="executive"] .info>.tip{grid-column:3;grid-row:1/3}
+.game-root[data-game-id="executive"][data-orientation="portrait"]:not([data-phase="finished"]) .info{display:flex;flex-direction:column;align-items:stretch;gap:6px}
+.game-root[data-game-id="executive"][data-orientation="portrait"] .choice{padding:4px;border-radius:10px}
+
+/* Fix2: keep recall slots and candidate cards together. */
+.game-root[data-game-id="memory"][data-phase="answering"] .memory-content{justify-content:center;gap:var(--memory-group-gap,16px)}
+.game-root[data-game-id="memory"][data-phase="answering"] #options-area{flex:none}
+
+.game-root .instruction{font-size:calc(var(--ui-font,16px)*1.2)}
+.game-root .tips,.game-root .tip{font-size:calc(var(--ui-font,16px)*.875)}
+.game-root .status-pill,.game-root .pill{font-size:var(--ui-font,16px)}
+
+/* Fix3: the rule belongs to the answer group; compact help stays in the top band. */
+.game-root[data-game-id="executive"]:not([data-phase="finished"]) .info{display:flex;flex-direction:row;justify-content:space-between;align-items:flex-start;gap:20px}
+.executive-hud{display:flex;flex-direction:column;gap:12px;max-width:360px;flex:1;min-width:0}
+.game-root[data-game-id="executive"] .info>.tip{width:min(40%,var(--tip-width,300px));max-width:var(--tip-width,300px);flex:none;margin:0}
+.game-root[data-game-id="executive"] .play{gap:var(--rule-gap,20px)}
+.game-root[data-game-id="executive"] .play>.instruction{width:min(100%,520px);text-align:center;flex:none;margin:0;padding:12px 20px}
+.game-root[data-game-id="executive"] .play>.instruction .rule{margin-top:8px}
+.game-root[data-game-id="executive"][data-orientation="portrait"] .info>.tip{display:none}
+.game-root[data-game-id="executive"][data-orientation="portrait"] .executive-hud{width:100%;max-width:none}
+.game-root[data-game-id="executive"][data-orientation="portrait"] .play>.instruction{font-size:var(--ui-font,16px);padding:9px 12px}
+/* A result appearing cannot change the board viewport. */
+.game-root.attention-page .find-stage{grid-template-rows:minmax(0,1fr) var(--attention-footer-height,64px)}
+.game-root.attention-page .round-footer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;height:var(--attention-footer-height,64px);min-height:var(--attention-footer-height,64px);align-items:center}
+.round-footer .round-hint,.round-footer .result-board{grid-area:1/1;width:fit-content;max-width:100%;margin:0}
+.round-footer #btn-next{grid-area:1/2}
+.game-root[data-game-id="memory"][data-phase="answering"] #answer-area{width:fit-content;max-width:100%}
+.game-root[data-game-id="memory"][data-phase="answering"] #options-area{width:max-content;max-width:100%}
+
+.game-root[data-game-id="executive"][data-phase="finished"] .executive-hud{display:none}
+
+.game-root[data-game-id="executive"] .choices{width:max-content;max-width:100%}
+
+/* Fix3 positioning patch: button visibility and wording never re-centre choices. */
+.game-root[data-game-id="executive"]:not([data-phase="finished"]) .play{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:var(--semantic-top-band,180px) var(--choice-size,180px) var(--semantic-bottom-band,100px);gap:0;justify-items:center;align-items:start;min-height:var(--semantic-min-height,0px)}
+.game-root[data-game-id="executive"] .play>.instruction{grid-area:1/1;align-self:end;margin:0 0 var(--rule-gap,20px)}
+.game-root[data-game-id="executive"] .choices{grid-area:2/1;align-self:start}
+.game-root[data-game-id="executive"] .action-row{grid-area:3/1;align-self:start;margin-top:20px}
