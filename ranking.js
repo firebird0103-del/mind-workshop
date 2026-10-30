@@ -24,7 +24,7 @@ export function escapeHTML(value) {
 }
 
 export function showRankings(panel, content, open, games, core, onManage) {
-  const history = core.scores.getHistory().filter(r => r && typeof r === 'object');
+  let history = core.scores.getHistory().filter(r => r && typeof r === 'object');
   const player = core.player.getName();
   let active = 0, view = 'rank';
   const e = escapeHTML;
@@ -34,6 +34,14 @@ export function showRankings(panel, content, open, games, core, onManage) {
     '<div class="eyebrow">WORKSHOP HALL OF FAME</div>' +
     '<h2>腦內工坊英雄榜</h2>' +
     '<p class="rank-intro">每一次完成工作室挑戰，都會留存成績並推進工坊創作。</p>' +
+    '<div class="settings-buttons" id="rankActions" style="margin:0 0 14px"></div>' +
+    '<div id="rankClearConfirm" class="collection-clear-confirm" hidden style="margin:0 0 14px">' +
+      '<p>確定清除所有遊玩紀錄？建議先匯出備份；清除後目前作品進度、收藏與設定都會保留。</p>' +
+      '<div class="settings-buttons">' +
+        '<button id="confirmClearRankings" type="button">確認清除</button>' +
+        '<button id="cancelClearRankings" type="button">取消</button>' +
+      '</div>' +
+    '</div>' +
     '<div class="rank-game-tabs" id="rankGames"></div>' +
     '<div class="rank-view-tabs">' +
       '<button data-view="rank">TOP 5</button>' +
@@ -43,13 +51,56 @@ export function showRankings(panel, content, open, games, core, onManage) {
     '<div id="rankingBody"></div>' +
     '<p class="muted">本機成績 · 同名可重複上榜 · 分數優先，同分比時間，再比紀錄新舊。</p>';
 
+  const actions = content.querySelector('#rankActions');
   if (onManage) {
     const manage = document.createElement('button');
+    manage.type = 'button';
     manage.className = 'rank-manage';
+    manage.style.margin = '0';
     manage.textContent = '匯出／匯入紀錄 ↗';
     manage.onclick = onManage;
-    content.querySelector('.rank-intro').after(manage);
+    actions.append(manage);
   }
+
+  const clearBtn = document.createElement('button');
+  clearBtn.type = 'button';
+  clearBtn.id = 'clearRankings';
+  clearBtn.className = 'rank-manage';
+  clearBtn.style.margin = '0';
+  clearBtn.textContent = '清除所有紀錄';
+  clearBtn.disabled = !history.length;
+  actions.append(clearBtn);
+
+  const confirmBox = content.querySelector('#rankClearConfirm');
+  const confirmBtn = content.querySelector('#confirmClearRankings');
+  const cancelBtn = content.querySelector('#cancelClearRankings');
+
+  clearBtn.onclick = () => {
+    confirmBox.hidden = false;
+    confirmBtn.focus();
+  };
+  cancelBtn.onclick = () => {
+    confirmBox.hidden = true;
+    clearBtn.focus();
+  };
+  confirmBtn.onclick = () => {
+    if (!core.scores.clear()) return;
+    history = [];
+    confirmBox.hidden = true;
+    clearBtn.disabled = true;
+    try {
+      window.BrainRecordsTransfer?.resetPreview?.(false);
+      window.renderModalData?.([]);
+      window.BrainRecordsTransfer?.status?.('已清除所有紀錄。可從「匯入備份」還原先前資料。');
+    } catch {}
+    render();
+    const toastEl = document.getElementById('toast');
+    if (toastEl) {
+      toastEl.textContent = '已清除所有遊玩紀錄，目前作品、收藏與設定保留。';
+      toastEl.classList.add('show');
+      setTimeout(() => toastEl.classList.remove('show'), 4200);
+    }
+  };
 
   const gameNav = content.querySelector('#rankGames');
   games.forEach((g, i) => {
