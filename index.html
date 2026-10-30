@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5ede0">
+  <title>心智大作戰：腦內工坊｜V3.0</title>
+  <link rel="stylesheet" href="legacy/brain-records-transfer.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="workbench.css">
+</head>
+<body>
+  <div id="demoNotice" hidden>展示模式 · 不寫入遊玩進度 <a href="./">返回遊玩 ↗</a></div>
+  <header>
+    <a class="wordmark" href="./" aria-label="心智大作戰：腦內工坊首頁">
+      <span>心</span><span>智</span><span>大</span><span>作</span><span>戰</span>
+    </a>
+    <div class="top-actions">
+      <button id="collectionBtn" title="檢視中央作品組裝藍圖"><span id="headerCraftIcon">🐦</span> <span id="headerCraftBadge">機械小鳥 0/4</span></button>
+      <button id="ranking">♛ <span>英雄榜</span></button>
+      <button id="settings" aria-label="工坊控制台" title="工坊控制台">⚙ <span>控制台</span></button>
+    </div>
+  </header>
+
+  <main>
+    <div class="intro">
+      <div class="eyebrow">MIND WORKSHOP</div>
+      <h1>探索你的腦內工坊</h1>
+    </div>
+
+    <div class="world" id="world">
+      <canvas id="scene" aria-label="3D 腦內工坊：包含四座雙層剖面工作室、中央圓形製作臺、雙側木梯、齒輪升降臺與 8 位居民。"></canvas>
+      <div id="loading">正在點亮腦內工坊的燈火與發條<span>● ● ●</span></div>
+
+      <!-- Floating studio entry badges in panorama view -->
+      <div class="studio-labels" id="labels"></div>
+
+      <!-- Resident & Animal speech bubbles -->
+      <div id="speechLayer"></div>
+
+      <!-- Skippable crafting animation banner -->
+      <div id="craftBanner" class="craft-banner" hidden role="status" aria-live="polite">
+        <span id="craftBannerText">居民正在將零件送往中央製作臺…</span>
+        <button id="skipCraftAnim" type="button">跳過動畫 ⏭</button>
+      </div>
+
+      <!-- Live activity log -->
+      <div class="workshop-log">
+        <i></i>
+        <span id="workshopLog">工坊日常進行中，探索工作室，也看看居民的咖啡與音樂時光。</span>
+      </div>
+
+      <!-- Collapsible time and camera controls -->
+      <div class="workshop-hud" id="workshopHud" data-expanded="false">
+        <button id="hudToggle" class="live-clock" type="button" aria-expanded="false" aria-controls="hudControls" title="展開場景操作">
+          <span id="clockIcon" aria-hidden="true">☀</span>
+          <strong id="workshopClock">11:00</strong>
+          <span class="hud-chevron" aria-hidden="true">⌄</span>
+        </button>
+        <div id="hudControls" hidden>
+          <button id="clockCycleBtn" type="button" title="切換晨光／日光／傍晚／夜間"><span id="clockPhase">日光工作室</span><small>切換時段 ↻</small></button>
+          <div class="navigation-switch" role="group" aria-label="拖曳操作模式">
+            <button id="rotateMode" aria-pressed="true">↻ 旋轉</button>
+            <button id="panMode" aria-pressed="false">✥ 平移</button>
+          </div>
+          <button id="overview" type="button">⌂ 工坊全景</button>
+          <button id="focusBirdTool" class="hud-highlight" type="button">⚙ 聚焦中央作品</button>
+          <button id="viewingMode" type="button">▣ 純觀賞模式</button>
+          <p class="hud-help">觀賞時隱藏全部介面。<br>按 Esc 返回；觸控可雙指輕點返回。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Studio & Crafting Dock -->
+    <section class="dock" aria-label="工作室選擇與製作進度">
+      <div class="dock-top">
+        <div class="age player-summary" aria-live="polite">
+          <span class="player-chip">♙ <span id="playerSummary">尚未設定玩家</span></span>
+          <small id="playerSummaryHint">首次挑戰時設定年齡與暱稱</small>
+          <select id="age" hidden disabled aria-hidden="true" tabindex="-1">
+            <option value="">請選擇年齡</option>
+            <option>7–12 歲</option>
+            <option>13–18 歲</option>
+            <option>19–35 歲</option>
+            <option>36–55 歲</option>
+            <option>56–70 歲</option>
+            <option>71 歲以上</option>
+          </select>
+        </div>
+        <div class="progress">
+          <span id="progress">機械小鳥進度 0 / 4</span>
+          <div id="dots"></div>
+          <button id="openCollectionLink" class="link-btn" type="button">組裝藍圖 ↗</button>
+          <button id="reset" type="button">新一局</button>
+        </div>
+      </div>
+      <nav id="games" aria-label="四座主題工作室遊戲入口"></nav>
+    </section>
+
+    <footer>
+      <span>單指旋轉 · 雙指平移／縮放 · 完成任一挑戰即可推進中央作品</span>
+
+    </footer>
+  </main>
+
+  <!-- Compact Studio Card: Name, short intro, and "開始遊戲" visible simultaneously without scrolling -->
+  <aside id="detail" hidden aria-label="工作室資訊">
+    <button class="close" data-close aria-label="關閉工作室卡片">×</button>
+    <div class="eyebrow" id="detailZone"></div>
+    <h2 id="detailTitle"></h2>
+    <p id="detailDesc"></p>
+    <div class="detail-part-pill" id="detailPartPill"></div>
+    <div class="detail-actions">
+      <button class="primary" id="launch">開始遊戲 →</button>
+      <button id="moreGame" class="secondary-button" type="button">詳細說明與藍圖 ↗</button>
+    </div>
+  </aside>
+
+  <aside id="lampCard" class="lamp-card" hidden aria-label="檯燈調整">
+    <button id="closeLamp" class="close" type="button" aria-label="關閉檯燈調整">×</button>
+    <div class="eyebrow">DESK LAMP</div><h2>調整檯燈</h2>
+    <label>燈頭仰角 <output id="lampAngleOutput"></output><input id="lampAngle" type="range" min="25" max="75" step="1"></label>
+    <label>左右方向 <output id="lampYawOutput"></output><input id="lampYaw" type="range" min="-25" max="25" step="1"></label>
+    <label>整盞轉向 <output id="lampHeadingOutput"></output><input id="lampHeading" type="range" min="-50" max="50" step="1"></label>
+    <label>光線強度 <output id="lampIntensityOutput"></output><input id="lampIntensity" type="range" min="0" max="200" step="5"></label>
+    <details><summary>桌面位置</summary>
+      <label>左右位置 <output id="lampXOutput"></output><input id="lampX" type="range" min="-12.4" max="-9.4" step="0.05"></label>
+      <label>前後位置 <output id="lampZOutput"></output><input id="lampZ" type="range" min="-2" max="1.6" step="0.05"></label>
+    </details>
+    <div class="settings-buttons"><button id="lampMove" type="button" aria-pressed="false">↔ 移動檯燈</button><button id="lampPreview" type="button">試亮檯燈</button><button id="lampReset" type="button">恢復預設</button></div>
+    <p>可直接拖曳檯燈移動，或用滑桿調整位置與方向；夜間會依設定亮度自動亮起。</p>
+  </aside>
+
+  <div id="workRunBar" class="work-run-bar" hidden role="status"><span>發條機械車・桌面試車中</span><button id="workReturn" type="button">提早返回</button></div>
+
+  <!-- Resident / Animal Interaction Card -->
+  <aside id="residentCard" hidden aria-label="居民與動物互動卡片">
+    <button id="closeResident" class="close" aria-label="關閉居民資訊">×</button>
+    <div class="eyebrow" id="residentEyebrow">WORKSHOP RESIDENT</div>
+    <h2 id="residentName"></h2>
+    <div id="residentMood" class="mood-pill"></div>
+    <blockquote id="residentReply" aria-live="polite" aria-atomic="true"></blockquote>
+    <p id="residentTask"></p>
+    <p id="residentState"></p>
+    <small id="residentCount"></small>
+    <div id="residentActions" class="conversation-actions">
+      <button id="residentWave" type="button">打招呼 ☺</button>
+      <button id="residentAsk" type="button">工作與進度</button>
+      <button id="residentCheer" type="button">替你加油 ♡</button>
+      <button id="residentDispatch" type="button">配送／搭升降臺 ⚙</button>
+    </div>
+    <div id="animalActions" class="conversation-actions" hidden>
+      <button id="animalPet" type="button">摸摸牠 ♡</button>
+      <button id="animalFeed" type="button">給點心 ✦</button>
+    </div>
+  </aside>
+
+  <!-- General Modal Dialog (Rankings, Player Name Prompt, Blueprint Details, Settings, Help) -->
+  <dialog id="panel">
+    <button class="close" data-close aria-label="關閉視窗">×</button>
+    <div id="panelContent"></div>
+  </dialog>
+
+  <!-- Persistent v10.7 Records Export / Import Backup Dialog -->
+  <dialog id="recordsPanel" aria-labelledby="workshopRecordsTitle">
+    <button class="close" data-close aria-label="關閉紀錄備份">×</button>
+    <div class="eyebrow">PLAY RECORDS · v10.7</div>
+    <h2 id="workshopRecordsTitle">遊玩紀錄備份與匯出</h2>
+    <p class="muted">匯出全部關卡的成績，或從其他電腦帶回備份。資料只在這台電腦處理，不影響工坊進度。</p>
+    <section class="records-transfer" id="records-transfer" aria-label="資料匯出與還原">
+      <div class="records-transfer-actions">
+        <button type="button" id="records-export-button" class="records-primary" data-transfer-control>匯出資料</button>
+        <button type="button" id="records-import-button" data-transfer-control>匯入備份</button>
+      </div>
+      <input type="file" id="records-import-file" accept=".zip,.json" hidden data-transfer-control>
+      <p class="records-note"><span id="records-total"></span>。匯出 ZIP 內含研究用 Excel 與可還原的完整備份。</p>
+      <div id="records-transfer-status" class="records-transfer-status" role="status" aria-live="polite"></div>
+      <section class="records-import-preview" id="records-import-preview" aria-labelledby="records-import-title" hidden>
+        <h3 id="records-import-title">確認匯入內容</h3>
+        <div id="records-import-counts" class="records-import-counts"></div>
+        <div id="records-import-games" class="records-import-games"></div>
+        <fieldset>
+          <legend>匯入方式</legend>
+          <label><input type="radio" id="records-mode-merge" name="records-import-mode" value="merge" checked data-transfer-control>合併紀錄（略過重複）</label>
+          <label><input type="radio" id="records-mode-replace" name="records-import-mode" value="replace" data-transfer-control>以備份取代目前紀錄</label>
+        </fieldset>
+        <div id="records-import-effect" class="records-import-effect"></div>
+        <div class="records-transfer-actions">
+          <button type="button" id="records-import-confirm" class="records-primary" data-transfer-control>確認匯入</button>
+          <button type="button" id="records-import-cancel" data-transfer-control>取消</button>
+        </div>
+      </section>
+    </section>
+    <button id="recordsBack" class="text-button" type="button">← 返回英雄榜</button>
+  </dialog>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <dialog id="workbench" aria-labelledby="workbenchTitle" aria-describedby="workbenchPlayer" data-phase="ready">
+    <div id="workbenchFrame">
+      <div class="bench-head">
+        <div class="bench-heading"><span class="bench-mark" aria-hidden="true">⚙</span><div class="bench-heading-copy"><span id="workbenchStudio" hidden></span><h2 id="workbenchTitle">工坊工作台</h2><span id="workbenchPlayer"></span></div></div>
+        <div class="bench-actions"><span id="workbenchPhase" role="status">準備挑戰</span><button id="workbenchClose" type="button">← 回到工坊</button></div>
+      </div>
+      <div id="workbenchBody" tabindex="-1"><div id="workbenchGame"></div></div>
+    </div>
+    <div id="workbenchExitPrompt" hidden role="alertdialog" aria-modal="true" aria-labelledby="workbenchExitTitle" aria-describedby="workbenchExitDescription">
+      <div class="bench-confirm"><h3 id="workbenchExitTitle">返回工坊？</h3><p id="workbenchExitDescription">目前這次挑戰的進度不會儲存，確定要返回工坊嗎？</p><div><button id="workbenchStay" type="button">繼續挑戰</button><button id="workbenchLeave" type="button">返回工坊</button></div></div>
+    </div>
+  </dialog>
+
+  <!-- Non-blocking Right-Side Mechanical Songbird Interactive Showcase Card (keeps 3D continuity!) -->
+  <aside class="bird-showcase-card" id="celebrate" hidden aria-label="作品互動展示控制卡">
+    <button id="closeCelebrate" class="close" type="button" aria-label="關閉作品互動卡">×</button>
+    <div class="eyebrow" id="celebrateEyebrow">AUTOMATON SHOWCASE · 4/4 完成</div>
+    <h2 id="celebrateTitle">🐦 機械小鳥互動展示</h2>
+    <p id="celebrateDesc">四座工作室材料已於中央圓桌合體組裝完成！點選下方按鈕可直接操控 3D 機械小鳥演出：</p>
+    <div class="bird-action-grid" id="birdActionGrid">
+      <button id="birdSpinBtn" type="button">🔄 360° 旋轉展示</button>
+      <button id="celebrateWatch" class="primary" type="button">🦅 展翅飛起動作</button>
+      <button id="birdChirpBtn" type="button">🎵 發條鳴唱振翅</button>
+      <button id="birdExplodeBtn" type="button">🔍 零件拆解／合體</button>
+    </div>
+    <div class="tray-status-list" id="trayStatusList" hidden></div>
+    <div class="celebrate-footer-actions">
+      <button id="birdCollectionModalBtn" type="button">📋 組裝藍圖詳情</button>
+      <button id="celebrateNext" type="button">↻ 開啟下一件製作</button>
+    </div>
+  </aside>
+
+  <!-- Original v10.7 Core, Config, Audio, Names, and Records Transfer Pipeline -->
+  <script src="legacy/brain-config.js"></script>
+  <script src="legacy/brain-layout.js"></script>
+  <script src="legacy/brain-interference.js"></script>
+  <script src="legacy/brain-games.js"></script>
+  <script src="legacy/brain-audio.js"></script>
+  <script src="legacy/brain-core.js"></script>
+  <script src="legacy/brain-names.js"></script>
+  <script src="legacy/brain-records-data.js"></script>
+  <script src="legacy/vendor/jszip.min.js"></script>
+  <script src="legacy/brain-records-workbook.js"></script>
+  <script src="records-integration.js"></script>
+  <script src="legacy/brain-records-transfer.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
