@@ -1,3 +1,4 @@
+import {createCourierTour} from './courier-tour.js';
 import {createStudioRoutines} from './studio-routines.js';
 import {LANDING_LAYOUT} from './landing-layout.js';
 import {LIFE_LAYOUT} from './life-layout.js';
@@ -307,7 +308,7 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[]}={})
     if(a.index<4){const side=a.index%2===0?-1:1;if(a.routine?.active)return([x])=>side*x>=(a.floor===2?2.50:2.64)-1e-6;if(a.floor===2)return([x])=>side*x>=1.55;
       if(a.index>=2)return([x,z])=>side*x>=.88&&side*x<=6.45&&z<=2.10;
       return([x,z])=>side*x>=.75&&side*x<=2.16&&z>=.74;}
-    if(a.index===4)return a.floor===2?([x])=>Math.abs(x)<=1.10:([x,z])=>Math.abs(x)<=.70&&z<=.35;
+    if(a.index===4)return a.floor===2?([x,z])=>Math.abs(x)<=1.10+1e-6||z<=-1.00+1e-6||Math.abs(x)>=2.50:([x,z])=>Math.abs(x)<=5.2&&z>=-.86&&z<=.35;
     return a.index===6?([x,z])=>x>=3.65&&z<.85:([x,z])=>x<=-3.30&&z>-.25&&z<1.35;
   }
   function replan(a) {
@@ -558,6 +559,8 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[]}={})
   const life=createResidentLife({actors,setFloorGoal,stepPath,clearance:RESIDENT_CLEARANCE,canMove:(a,next)=>segmentClearOnFloor(a.p,next,a.floor)&&canMove(a,next)});
   const studioRoutines=createStudioRoutines({actors,setFloorGoal,stepPath});
 
+  const courierTour=createCourierTour({actors,setFloorGoal,stepPath,requestElevator,elevator:ELEVATOR,lanes,clearGoal:a=>{a.goal=null;a.path=[];a.replanDelay=0;}});
+
   function update(dt) {
     dt = Math.max(0, Math.min(dt, 0.25));
     const events = [];
@@ -590,7 +593,7 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[]}={})
 
       a.elapsed += dt;
       if(a.index>=5){life.update(a,dt);continue;}
-      if(a.index<4&&!a.priorityDelivery&&['working','resting'].includes(a.stage)){studioRoutines.update(a,dt);continue;}
+      if(a.index<4&&!a.priorityDelivery&&['working','resting'].includes(a.stage)){if(!courierTour.hostUpdate(a,dt))studioRoutines.update(a,dt);continue;}
       if(a.index<4&&a.stage==='return-parcel'){
         r.state='retrieving';a.moving=false;
         a.parcel.state='return-pick';a.parcel.progress=Math.min(1,a.elapsed/.65);
@@ -609,7 +612,13 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[]}={})
         continue;
       }
       if(a.index<4&&a.stage==='home-after-stow'){
-        r.state='returning';setFloorGoal(a,a.cfg.homePos);
+        r.state='returning';
+        // A visitor or the music operator may temporarily cover the old home
+        // anchor. Finish returning at the clear room-side point instead of
+        // waiting forever head-to-head in the narrow rear passage.
+        const floorNav=a.floor===1?nav.nav1:nav.nav2,home=floorNav.snap(a.cfg.homePos);
+        const occupied=a.index>=2&&actors.some(b=>b!==a&&Math.abs(b.y-a.y)<.75&&Math.hypot(b.p[0]-home[0],b.p[1]-home[1])<RESIDENT_CLEARANCE);
+        setFloorGoal(a,occupied?[(a.index%2===0?-1:1)*2.86,.54]:a.cfg.homePos);
         if(stepPath(a,dt,.85,.015)){a.stage=a.priorityDelivery?'to-source':'resting';a.elapsed=0;a.goal=null;}
         continue;
       }
@@ -773,65 +782,7 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[]}={})
         continue;
       }
 
-      if (a.index === 4) {
-        r.activity=({working:'查看二樓平台護欄與入口','to-lift-2f':'走向升降臺，準備巡視一樓','to-table':'走到一樓，看看齒輪機構',assembling:'停下來觀察齒輪與入口','to-lift-1f':'返回升降臺，準備上樓','to-home-2f':'巡視二樓平台與連通廊',resting:'在平台停留，看看工坊夥伴'})[a.stage]||'巡視升降臺';
-        if (a.stage === 'working') {
-          r.state = 'observing';
-          setFloorGoal(a, a.cfg.homePos);
-          if (stepPath(a, dt, 0.78) && a.elapsed >= 2.6) {
-            a.stage = 'to-lift-2f';
-            a.elapsed = 0;
-            a.goal = null;
-            events.push([a.index, 'depart']);
-          }
-        } else if (a.stage === 'to-lift-2f') {
-          r.state = 'walking';
-          setFloorGoal(a, [ELEVATOR.wait2F[0], ELEVATOR.wait2F[2]]);
-          if (stepPath(a, dt, 0.85)) {
-            requestElevator(a, 'to-table');
-          }
-        } else if (a.stage === 'to-table') {
-          r.state = 'walking';
-          setFloorGoal(a, [a.cfg.deliverySpot[0], a.cfg.deliverySpot[2]]);
-          if (stepPath(a, dt, 0.85)) {
-            a.stage = 'assembling';
-            a.elapsed = 0;
-          }
-        } else if (a.stage === 'assembling') {
-          r.state = 'resting';
-          a.yaw = Math.atan2((0 - a.p[0]) * 0.55, Math.max(0.65, CENTRAL_WORKBENCH.center[2] + 0.85 - a.p[1]));
-          a.moving = false;
-          if (a.elapsed >= 2.4) {
-            r.inspections=(r.inspections||0)+1;
-            a.stage = 'to-lift-1f';
-            a.elapsed = 0;
-            a.goal = null;
-          }
-        } else if (a.stage === 'to-lift-1f') {
-          r.state = 'returning';
-          setFloorGoal(a, [ELEVATOR.wait1F[0], ELEVATOR.wait1F[2]]);
-          if (stepPath(a, dt, 0.85)) {
-            requestElevator(a, 'to-home-2f');
-          }
-        } else if (a.stage === 'to-home-2f') {
-          r.state = 'returning';
-          setFloorGoal(a, a.cfg.workPos);
-          if (stepPath(a, dt, 0.82)) {
-            a.stage = a.priorityDelivery?'to-source':'resting';
-            releaseLane(a);
-            a.elapsed = 0;
-          }
-        } else if (a.stage === 'resting') {
-          r.state = 'resting';
-          a.moving = false;
-          a.yaw = a.index % 2 === 0 ? 0.38 : -0.38;
-          if (a.elapsed >= 2.6) {
-            a.stage = 'working';
-            a.elapsed = 0;
-          }
-        }
-        continue;
-      }
+      if (a.index === 4) {courierTour.update(dt);continue;}
 
     }
 
