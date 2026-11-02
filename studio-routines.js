@@ -5,14 +5,14 @@ import {LIFE_LAYOUT as L} from './life-layout.js';
 export const STUDIO_ROUTINES = [
   [
     {at:[-4.18,-.78],look:[-3.75,4.85,-1.9],kind:'observe',seconds:3.6,text:'走到鐘面前觀察指針與方位'},
-    {at:[-3.74,.98],look:[-3.55,3.75,-.05],kind:'observe',seconds:3.4,text:'繞到木模前方，比對立體形狀'},
-    {at:[-2.64,-.34],look:[-3.75,4.85,-1.9],kind:'observe',seconds:2.6,text:'換個角度查看空間配置'},
+    {at:[-3.96,.98],look:[-3.90,3.75,-.05],kind:'observe',seconds:3.4,text:'繞到木模前方，比對立體形狀'},
+    {at:[-2.86,-.34],look:[-3.75,4.85,-1.9],kind:'observe',seconds:2.6,text:'換個角度查看空間配置'},
     {at:L.couriers[0].pickup,look:L.couriers[0].source,kind:'inspect',seconds:2.8,text:'檢查備料座上的組件盒'}
   ],
   [
-    {at:[3.30,-.78],look:[4.22,3.95,-.02],kind:'observe',seconds:3.2,text:'走到標本後方，比對成對細節'},
-    {at:[4.18,.98],look:[4.22,3.95,-.02],kind:'observe',seconds:3.8,text:'從展示臺前方查看標本差異'},
-    {at:[2.64,.32],look:[3.12,4.05,.05],kind:'observe',seconds:2.7,text:'查看放大鏡與觀察工具'},
+    {at:[3.52,-.78],look:[4.52,3.95,-.02],kind:'observe',seconds:3.2,text:'走到標本後方，比對成對細節'},
+    {at:[4.40,.98],look:[4.52,3.95,-.02],kind:'observe',seconds:3.8,text:'從展示臺前方查看標本差異'},
+    {at:[2.86,.32],look:[3.52,4.05,.05],kind:'observe',seconds:2.7,text:'查看放大鏡與觀察工具'},
     {at:L.couriers[1].pickup,look:L.couriers[1].source,kind:'inspect',seconds:2.6,text:'檢查已整理好的精密組件盒'}
   ],
   [

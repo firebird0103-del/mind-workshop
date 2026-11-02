@@ -34,7 +34,7 @@ export function createCourierTour({actors,setFloorGoal,stepPath,requestElevator,
   if(a.stage==='tour-out'){
    const stop=q.room,side=Math.sign(stop.at[0]);r.state='walking';r.activity='走進'+stop.name+'工作室，拜訪夥伴';
    if((Math.abs(a.p[0])<.8&&q.lane===null&&!q.hostReady)||(Math.abs(a.p[0])<2.9&&!reserve(side))){r.state='observing';r.activity='在入口旁等候，讓零件配送先通過';a.moving=false;return;}
-   const approach=a.floor===1?[side*2.86,-.78]:[side*2.64,-1.00];
+   const approach=a.floor===1?[side*2.86,-.78]:[side*2.86,-1.00];
    const target=side*a.p[0]<(a.floor===1?2.80:2.58)?approach:stop.at;
    const arrived=walk(target,dt)&&target===stop.at;
    if(q.waiting>1.5&&Math.abs(a.p[0])<.8){release();clearGoal(a);q.waiting=0;}
@@ -64,7 +64,7 @@ export function createCourierTour({actors,setFloorGoal,stepPath,requestElevator,
   if(!stop||host.index!==stop.resident||host.floor!==a.floor||!['tour-out','tour-visit','tour-return'].includes(a.stage))return false;
   // Wait outside the music corner until its listener has a long seated interval.
   if(stop.id==='executive'&&a.stage==='tour-out'&&Math.abs(a.p[0])<.8&&q.lane===null){const l=actors[6].life;if(l.seated<.99||l.step!==7||l.time>8){q.hostReady=false;return false;}}
-  const points=[[-2.64,-.34],[2.64,.32],[-2.86,1.20],[2.86,1.20]];
+  const points=[[-2.86,-.34],[2.86,.32],[-2.86,1.20],[2.86,1.20]];
   const point=points[host.index],side=host.index%2===0?-1:1;
   const target=host.floor===1&&side*host.p[0]>2.96&&host.p[1]<.4?[side*2.86,-.56]:point;
   host.r.activity='留出通道，在工作室裡與小郵碰面';

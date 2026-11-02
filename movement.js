@@ -222,7 +222,7 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[], res
     // 0: 小時 (Spatial 2F Left - behind the polyhedron worktable)
     {floor: 2, pos: [-3.55, -1.02], homePos: [-3.55, -1.02], homeFloor: 2, workPos: [-4.25, -0.55], transport: 'stair-left', deliverySpot: CENTRAL_WORKBENCH.deliverySpots[0], initDelay: -1.0},
     // 1: 阿鏡 (Attention 2F Right - beside the giant magnifier)
-    {floor: 2, pos: [2.68, -0.52], homePos: [2.68, -0.52], homeFloor: 2, workPos: [3.65, -0.78], transport: 'stair-right', deliverySpot: CENTRAL_WORKBENCH.deliverySpots[1], initDelay: -6.5},
+    {floor: 2, pos: [2.86, -0.56], homePos: [2.86, -0.56], homeFloor: 2, workPos: [3.65, -0.78], transport: 'stair-right', deliverySpot: CENTRAL_WORKBENCH.deliverySpots[1], initDelay: -6.5},
     // 2: 芽芽 (Memory 1F Left - examining memory cards in the green studio)
     {floor: 1, pos: [-3.42, -0.57], homePos: [-3.42, -0.57], homeFloor: 1, workPos: [-3.55, 0.0], transport: 'door-memory', deliverySpot: CENTRAL_WORKBENCH.deliverySpots[2], initDelay: -12.0},
     // 3: 方方 (Switch 1F Right - sorting geometric shapes in the purple studio)
@@ -307,7 +307,7 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[], res
 
   function allowedFor(a){
     if(a.dynamicAllowed)return a.dynamicAllowed;
-    if(a.index<4){const side=a.index%2===0?-1:1;if(a.routine?.active)return([x])=>side*x>=(a.floor===2?2.50:2.64)-1e-6;if(a.floor===2)return([x])=>side*x>=1.55;
+    if(a.index<4){const side=a.index%2===0?-1:1;if(a.routine?.active)return([x])=>side*x>=(a.floor===2?2.86:2.64)-1e-6;if(a.floor===2)return([x])=>side*x>=1.55;
       if(a.index>=2)return([x,z])=>side*x>=.88&&side*x<=6.45&&z<=2.10;
       return([x,z])=>side*x>=.75&&side*x<=2.16&&z>=.74;}
     if(a.index===4)return a.floor===2?([x,z])=>Math.abs(x)<=1.10+1e-6||z<=-1.00+1e-6||Math.abs(x)>=2.50:([x,z])=>Math.abs(x)<=5.2&&z>=-.86&&z<=.35;
@@ -627,7 +627,7 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[], res
       if(a.index<4&&a.stage==='return-source'){
         r.state='returning';
         const side=a.index%2===0?-1:1,pickup=LIFE_LAYOUT.couriers[a.index].pickup;
-        const viaRear2F=a.floor===2&&side*a.p[0]<2.58?[side*2.64,-1.00]:pickup;
+        const viaRear2F=a.floor===2&&side*a.p[0]<2.75?[side*2.86,-1.00]:pickup;
         setFloorGoal(a,viaRear2F);
         if(stepPath(a,dt,.95)&&viaRear2F===pickup){a.stage='stow';a.elapsed=0;a.goal=null;}
         continue;

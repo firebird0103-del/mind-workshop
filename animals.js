@@ -9,8 +9,8 @@ export const ANIMALS = [
     name: '栗子',
     species: '工坊三花貓',
     icon: '🐈',
-    home: '一樓材料木箱與工作室內側走道',
-    routine: '在木箱上休息後跳下地面，沿工作室內側走道散步，停下探索後再回家',
+    home: '一樓材料木箱、前側圓弧露臺與工作室走道',
+    routine: '在木箱軟墊休息後跳下地面，交替沿著中央圓桌前緣露臺或右翼工作室走道散步探索',
     floor: 1,
     center: [1.98, WORKSHOP.floor1Y + 0.32, 2.82],
     restWalk: [1.22, WORKSHOP.floor1Y, 2.66],
@@ -23,8 +23,8 @@ export const ANIMALS = [
     home: '二樓視覺注意力工作室拱窗棲木臺',
     routine: '停在拱窗前的室內木棲臺上觀察標本與陽光，對打招呼的玩家拍翅鳴叫',
     floor: 2,
-    center: [4.98, WORKSHOP.floor2Y + 0.88, -0.55],
-    restWalk: [4.98, WORKSHOP.floor2Y + 0.88, -0.38],
+    center: [5.38, WORKSHOP.floor2Y + 0.88, -0.55],
+    restWalk: [5.38, WORKSHOP.floor2Y + 0.88, -0.38],
     color: '#a16f49'
   }
 ];

@@ -20,8 +20,8 @@ export const WORKSHOP = {
 
 // Solid curved bays, shared by navigation and asset acceptance tests.
 export const BALCONIES = [
-  {cx: -3.73, cz: -0.15, radius: 1.42, rugRadius: 1.26, halfWidth: 1.46},
-  {cx: 3.83, cz: -0.15, radius: 1.42, rugRadius: 1.32, halfWidth: 1.56}
+  {cx: -4.05, cz: -0.15, radius: 1.42, rugRadius: 1.26, halfWidth: 1.46},
+  {cx: 4.15, cz: -0.15, radius: 1.42, rugRadius: 1.32, halfWidth: 1.56}
 ];
 
 export const STUDIOS = [
@@ -32,14 +32,14 @@ export const STUDIOS = [
     title: '空間認知工作室',
     floor: 2,
     y: WORKSHOP.floor2Y,
-    center: [-3.75, 3.18, -0.45],
+    center: [-4.05, 3.18, -0.45],
     labelAnchor: [-5.05, 5.35, -0.45],
-    focusTarget: [-3.65, 4.10, -0.35],
+    focusTarget: [-3.95, 4.10, -0.35],
     focusDistance: 9.8,
     focusAngle: 0.10,
     focusPolar: 0.30,
     bounds: {x0: -5.25, x1: -2.30, z0: -2.05, z1: 0.58},
-    workstation: [-3.55, 3.18, -0.78],
+    workstation: [-3.90, 3.18, -0.78],
     storagePoint: [-4.42, 3.18, -0.62],
     balconyPoint: [-1.82, 3.18, -0.86]
   },
@@ -50,14 +50,14 @@ export const STUDIOS = [
     title: '視覺注意力工作室',
     floor: 2,
     y: WORKSHOP.floor2Y,
-    center: [3.85, 3.18, -0.45],
+    center: [4.15, 3.18, -0.45],
     labelAnchor: [5.15, 5.35, -0.45],
-    focusTarget: [3.75, 4.10, -0.35],
+    focusTarget: [4.05, 4.10, -0.35],
     focusDistance: 9.8,
     focusAngle: -0.10,
     focusPolar: 0.30,
     bounds: {x0: 2.30, x1: 5.42, z0: -2.05, z1: 0.58},
-    workstation: [2.68, 3.18, -0.52],
+    workstation: [2.86, 3.18, -0.52],
     storagePoint: [3.75, 3.18, -0.82],
     balconyPoint: [1.82, 3.18, -0.86]
   },
@@ -237,14 +237,14 @@ export const OBSTACLES_2F = [
   ...[-1,1].map(side=>({id:"lift-post-2f-"+side,shape:"circle",x:side*.54,z:-.87,radius:.105,hx:.105,hz:.105})),
   ...LIFE_LAYOUT.couriers.slice(0,2).map((c,i)=>({id:"parcel-source-"+i,shape:"circle",x:c.source[0],z:c.source[2],radius:.115,hx:.115,hz:.115})),
   {id:'lift-shaft-2f',shape:'circle',x:0,z:-1.38,radius:.65,hx:.65,hz:.65},
-  {id: 'spatial-table', x: -3.55, z: -0.05, hx: 0.55, hz: 0.36},
+  {id: 'spatial-table', x: -3.90, z: -0.05, hx: 0.55, hz: 0.36},
   {id: 'spatial-plinth', x: SPATIAL_LAYOUT.furniture.spatialPlinthX, z: 0.18, hx: 0.36, hz: 0.34},
   {id: 'spatial-drafting', x: SPATIAL_LAYOUT.furniture.spatialDraftX, z: -0.95, hx: 0.38, hz: 0.36},
-  {id: 'attention-domes', x: 4.22, z: -0.02, hx: 0.82, hz: 0.36},
-  {id: 'attention-magnifier', x: 3.12, z: 0.05, hx: 0.28, hz: 0.28},
+  {id: 'attention-domes', x: 4.54, z: -0.02, hx: 0.76, hz: 0.36},
+  {id: 'attention-magnifier', x: 3.52, z: 0.05, hx: 0.28, hz: 0.28},
   {id: 'attention-back-shelf', x: SPATIAL_LAYOUT.furniture.attentionBookcaseX, z: -1.82, hx: .45, hz: .19},
   {id:'attention-rear-desk',x:SPATIAL_LAYOUT.furniture.attentionDeskX,z:-1.55,hx:.43,hz:.25},
-  {id:'attention-perch',x:4.98,z:-.55,hx:.18,hz:.21}
+  {id:'attention-perch',x:5.38,z:-.55,hx:.18,hz:.21}
 ];
 
 export const REST_SPOTS = {

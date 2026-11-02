@@ -632,8 +632,9 @@ export function createWorld(canvas, onSelectStudio, onSelectCenter, onReady, onE
   });
 
   const catConfig=SPATIAL_LAYOUT.cat;
-  const catFloorPath=nav.nav1.route(nav.nav1.snap([catConfig.landing[0],catConfig.landing[2]]),nav.nav1.snap([catConfig.far[0],catConfig.far[2]]));
-  const catPatrol=createCatPatrol(ANIMALS[0].center,catFloorPath.map(([x,z])=>[x,WORKSHOP.floor1Y,z]),catConfig.speed,catConfig.jumpHeight);
+  const catStudioPath=nav.nav1.route(nav.nav1.snap([catConfig.landing[0],catConfig.landing[2]]),nav.nav1.snap([catConfig.far[0],catConfig.far[2]])).map(([x,z])=>[x,WORKSHOP.floor1Y,z]);
+  const catFrontPath=(catConfig.frontRoute||[[1.20,WORKSHOP.floor1Y,3.52],[0.60,WORKSHOP.floor1Y,3.66],[0.00,WORKSHOP.floor1Y,3.72],[-0.60,WORKSHOP.floor1Y,3.66],[-1.20,WORKSHOP.floor1Y,3.52]]).map(([x,y,z])=>[x,y??WORKSHOP.floor1Y,z]);
+  const catPatrol=createCatPatrol(ANIMALS[0].center,catFrontPath,catConfig.speed,catConfig.jumpHeight,[catStudioPath]);
   animalAvoidance=()=>catPatrol.avoidance();
 
   function switchResidentClip(m, clipName, fadeDuration = 0.18) {
@@ -666,7 +667,8 @@ export function createWorld(canvas, onSelectStudio, onSelectCenter, onReady, onE
             a.actions[a.activeCatAction]?.fadeOut(.2);a.actions[action].reset().fadeIn(.2).play();a.activeCatAction=action;
           }
           a.patrolState=pose.state;
-          a.status=pose.state==='rest'?'窩在木箱軟墊上休息':pose.state==='sniff'?'在工作室前方停下腳步，好奇地聞聞工具與木香':'沿著一樓工作室內側走道散步，巡視材料桌與收納櫃';
+          const onFrontTerrace=pose.position[2]>3.0;
+          a.status=pose.state==='rest'?'窩在木箱軟墊上休息':pose.state==='sniff'?(onFrontTerrace?'在中央圓桌與材料推車前停下腳步，好奇地聞聞齒輪與木香':'在工作室前方停下腳步，好奇地聞聞工具與木香'):(onFrontTerrace?'沿著中央圓桌前方的弧形木露臺悠閒散步':'沿著一樓工作室內側走道散步，巡視材料桌與收納櫃');
           a.mood=pose.state==='rest'?'呼嚕休息':pose.state==='sniff'?'好奇探索':'悠閒散步';
         }
       } else {
