@@ -62,9 +62,9 @@ export const DEFAULTS = {
   volume: 0.35,
   motion: true,
   cutaway: true,
-  quality: 1.4,
+  quality: 1.75,
   age: -1,
-  residentMode: 'classic',
+  residentMode: 'dynamic',
   paths: {
     time: 'legacy/clock_game.html',
     spot: 'legacy/find_diff_game.html',

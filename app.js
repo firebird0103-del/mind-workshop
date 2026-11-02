@@ -32,9 +32,13 @@ const icon = id =>
 const displayParams = new URLSearchParams(location.search);
 const isDemo = displayParams.get('demo') === '1';
 let cached = isDemo ? {} : read(KEYS.settings, {});
+if (!isDemo && !cached.v3DefaultMaxDynamic) {
+  cached = {...cached, quality: 1.75, residentMode: 'dynamic', v3DefaultMaxDynamic: true};
+  write(KEYS.settings, cached);
+}
 let settings = {...DEFAULTS, ...cached, paths: {...DEFAULTS.paths, ...(cached.paths || {})}};
 if (!Number.isInteger(settings.age) || settings.age < 0 || settings.age > 5) settings.age = -1;
-settings.quality = Math.max(1, Math.min(1.75, Number(settings.quality) || 1.4));
+settings.quality = Math.max(1, Math.min(1.75, Number(settings.quality) || 1.75));
 settings.lampPitch=Math.max(25,Math.min(75,Number(settings.lampPitch)||58));
 settings.lampYaw=Math.max(-25,Math.min(25,(Number.isFinite(Number(settings.lampYaw))?Number(settings.lampYaw):-12)));
 settings.lamp=normalizeLamp({...settings.lamp,pitch:settings.lamp?.pitch??settings.lampPitch,yaw:settings.lamp?.yaw??settings.lampYaw});
@@ -42,7 +46,7 @@ settings.volume = Math.max(0, Math.min(1, Number(settings.volume) || 0));
 const urlResidentMode = displayParams.get('residentMode');
 settings.residentMode = (urlResidentMode === 'dynamic' || urlResidentMode === 'classic')
   ? urlResidentMode
-  : (settings.residentMode === 'dynamic' ? 'dynamic' : 'classic');
+  : (settings.residentMode === 'classic' ? 'classic' : 'dynamic');
 for (const key of Object.keys(DEFAULTS.paths)) settings.paths[key] = DEFAULTS.paths[key];
 
 if (isDemo) { settings.motion=false; settings.sound=false; settings.age=3; }

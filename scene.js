@@ -575,10 +575,10 @@ export function createWorld(canvas, onSelectStudio, onSelectCenter, onReady, onE
       if (paramMode === 'dynamic' || paramMode === 'classic') resolvedResidentMode = paramMode;
       else {
         const stored = JSON.parse(globalThis.localStorage?.getItem('brainWorkshop.v1.settings') || '{}');
-        resolvedResidentMode = stored?.residentMode === 'dynamic' ? 'dynamic' : 'classic';
+        resolvedResidentMode = stored?.residentMode === 'classic' ? 'classic' : 'dynamic';
       }
     } catch {
-      resolvedResidentMode = 'classic';
+      resolvedResidentMode = 'dynamic';
     }
   }
   const town = createWorkshopTown(
