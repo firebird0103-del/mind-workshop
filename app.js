@@ -937,7 +937,7 @@ function renderBubbles(items) {
   const used = new Set();
   const rects = [];
   const base = layer.getBoundingClientRect();
-  const blocked = [...document.querySelectorAll('#detail,#residentCard,.workshop-hud,.dock,#craftBanner,.map-label')]
+  const blocked = [...document.querySelectorAll('#detail,#residentCard,.workshop-hud,.dock,#craftBanner,.map-label:not(.idle-hidden)')]
     .filter(e => !e.hidden)
     .map(e => {
       const r = e.getBoundingClientRect();
@@ -971,10 +971,12 @@ function renderBubbles(items) {
     const clampX = x => Math.max(width / 2 + 8, Math.min(layer.clientWidth - width / 2 - 8, x));
     const clampY = y => Math.max(height + 10, Math.min(layer.clientHeight - 10, y));
     const options = [
-      [b.x, b.y - 16],
-      [b.x - width * 0.65, b.y - 16],
-      [b.x + width * 0.65, b.y - 16],
-      [b.x, b.y + height + 24]
+      [b.x, b.y - 10],
+      [b.x - width * 0.20, b.y - 10],
+      [b.x + width * 0.20, b.y - 10],
+      [b.x - width * 0.36, b.y - 10],
+      [b.x + width * 0.36, b.y - 10],
+      [b.x, b.y - 26]
     ];
     let chosen = null;
     for (const [cx, cy] of options) {
@@ -983,11 +985,19 @@ function renderBubbles(items) {
       const r = {x: x - width / 2, y: y - height, w: width, h: height};
       if (
         ![...blocked, ...rects].some(
-          a => a.x < r.x + r.w + 8 && a.x + a.w + 8 > r.x && a.y < r.y + r.h + 8 && a.y + a.h + 8 > r.y
+          a => a.x < r.x + r.w + 6 && a.x + a.w + 6 > r.x && a.y < r.y + r.h + 6 && a.y + a.h + 6 > r.y
         )
       ) {
         chosen = {x, y, r};
         break;
+      }
+    }
+    if (!chosen) {
+      const x = clampX(b.x),
+        y = clampY(b.y - 10);
+      const r = {x: x - width / 2, y: y - height, w: width, h: height};
+      if (!rects.some(a => a.x < r.x + r.w + 4 && a.x + a.w + 4 > r.x && a.y < r.y + r.h + 4 && a.y + a.h + 4 > r.y)) {
+        chosen = {x, y, r};
       }
     }
     el.hidden = !chosen;

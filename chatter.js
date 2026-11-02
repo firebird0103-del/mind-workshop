@@ -8,9 +8,9 @@ const STUDIO_LINES = [
   ['把圖卡按順序排好，下一步就不會搞混囉。', '大樹下的木抽屜裡，收著每一件作品的記憶。'],
   ['紅色圓球放左邊、黃色方塊放右邊，分揀完成！', '換個規則再檢查一次，彩色木塊全都就定位了。'],
   ['搭乘中央升降臺上下樓，視野真好！', '升降臺的黃銅齒輪剛上過油，動起來好順暢。'],
-  ['把零件鎖緊一點，作品就能準備展示了！', '聞到休息角落的茶香了，組完這件去喝一杯吧。'],
-  ['每一枚黃銅鉚釘都要敲得平平整整。', '看到大家送來的材料越聚越多，真讓人期待！'],
-  ['木推車裡的齒輪都清點過了，隨時可以補給！', '嘘——栗子還在木箱裡睡午覺呢。']
+  ['坐在休息角落品嚐熱咖啡，看著大家忙碌真溫馨！', '休息區旁邊就是圖卡櫃與大樹，空氣裡都是咖啡香。'],
+  ['轉動手柄幫留聲機上發條，讓悠揚的旋律陪伴大家。', '坐在音樂角聽著黑膠唱片旋轉，節奏真讓人放鬆。'],
+  ['邊喝咖啡邊翻閱工坊筆記，把每次組裝的心得記下來。', '嘘——栗子還在木箱軟墊上睡午覺呢。']
 ];
 
 export function ambientLine(r, hour = 12, variant = 0, craftingProgress = 0, workName='作品') {
@@ -27,7 +27,7 @@ export function ambientLine(r, hour = 12, variant = 0, craftingProgress = 0, wor
     text = '踩穩木梯階梯，小心捧好手上的零件。';
   } else if (n === 1 && r.state?.startsWith('lift')) {
     text = '中央齒輪升降臺啟動囉，抓穩扶手！';
-  } else if (n === 1 && r.state === 'resting') {
+  } else if (n === 1 && r.state === 'resting' && r.index >= 5) {
     text = '在休息角落喘口氣，看看工坊裡的大家。';
   } else {
     const lines = STUDIO_LINES[r.index] || STUDIO_LINES[0];
@@ -35,7 +35,7 @@ export function ambientLine(r, hour = 12, variant = 0, craftingProgress = 0, wor
   }
   return {
     text,
-    mood: r.state === 'delivering' ? '協力組裝' : r.state === 'resting' ? '輕鬆愜意' : '專注工作',
+    mood: r.state === 'delivering' ? '協力組裝' : r.index >= 5 && r.state === 'resting' ? '輕鬆愜意' : '專注工作',
     emote: n % 2 ? '⚙' : '☺'
   };
 }

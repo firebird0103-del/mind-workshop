@@ -18,7 +18,7 @@ export const STUDIO_ROUTINES = [
   [
     {at:[-2.86,1.20],look:[-4.0,.99,2.08],kind:'observe',seconds:3.8,text:'走到圖卡櫃前，記住材料順序'},
     {at:[-3.52,-.56],look:[-3.85,1.55,-1.38],kind:'observe',seconds:3.4,text:'回到檔案櫃旁核對分類標籤'},
-    {at:[-2.86,.54],look:[-4.40,.8,.54],kind:'observe',seconds:2.4,text:'停下來看看咖啡角與夥伴'},
+    {at:[-3.08,.32],look:[-4.40,.8,.54],kind:'observe',seconds:2.4,text:'停下來看看咖啡角與夥伴'},
     {at:L.couriers[2].pickup,look:L.couriers[2].source,kind:'inspect',seconds:2.5,text:'檢查備料座上的記憶組件盒'}
   ],
   [

@@ -574,6 +574,21 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[], res
 
     stepElevator(dt);
 
+    // Automatically swing 1F wooden gates open when a 1F resident approaches or walks through them
+    for (const [id, d] of doors) {
+      if (d.owner !== null) continue;
+      const near = actors.some(a => {
+        if (a.floor !== 1) return false;
+        if (id === 'door-memory') return Math.abs(a.p[0] - (-2.42)) < 0.72 && a.p[1] > 0.38 && a.p[1] < 1.46;
+        if (id === 'door-switch') return Math.abs(a.p[0] - 2.42) < 0.72 && a.p[1] > 0.38 && a.p[1] < 1.46;
+        if (id === 'door-arch-back') return Math.abs(a.p[0] - 0.92) < 0.76 && Math.abs(a.p[1] - (-0.82)) < 0.54;
+        return false;
+      });
+      const targetAngle = near ? 1.45 : 0;
+      const rate = near ? 5.2 : 3.6;
+      d.angle += Math.sign(targetAngle - d.angle) * Math.min(Math.abs(targetAngle - d.angle), dt * rate);
+    }
+
     resolveOverlaps();
 
     if (dynamicEvents) dynamicEvents.tick(dt, events);
@@ -610,8 +625,11 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[], res
         continue;
       }
       if(a.index<4&&a.stage==='return-source'){
-        r.state='returning';setFloorGoal(a,LIFE_LAYOUT.couriers[a.index].pickup);
-        if(stepPath(a,dt,.95)){a.stage='stow';a.elapsed=0;a.goal=null;}
+        r.state='returning';
+        const side=a.index%2===0?-1:1,pickup=LIFE_LAYOUT.couriers[a.index].pickup;
+        const viaRear2F=a.floor===2&&side*a.p[0]<2.58?[side*2.64,-1.00]:pickup;
+        setFloorGoal(a,viaRear2F);
+        if(stepPath(a,dt,.95)&&viaRear2F===pickup){a.stage='stow';a.elapsed=0;a.goal=null;}
         continue;
       }
       if(a.index<4&&a.stage==='stow'){

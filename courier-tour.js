@@ -12,7 +12,7 @@ export function createCourierTour({actors,setFloorGoal,stepPath,requestElevator,
  function release(){if(a.tour.lane!==null){const lane=lanes[a.tour.lane];if(lane.owner===4)lane.owner=null;a.tour.lane=null;}}
  function reserve(side){
   const q=a.tour,index=side<0?0:1,lane=lanes[index];if(q.lane===index)return true;
-  if(lane.owner!==null||lane.queue.length||actors.some(b=>b.index<4&&b.floor===a.floor&&b.index%2===index&&(b.priorityDelivery||!['working','resting'].includes(b.stage))))return false;
+  if(lane.owner!==null||lane.queue.length||actors.some(b=>b.index<4&&b.index%2===index&&((b.floor===a.floor&&(b.priorityDelivery||!['working','resting'].includes(b.stage)))||(a.floor===2&&b.index<2&&b.stage==='stair-up'))))return false;
   lane.owner=4;q.lane=index;return true;
  }
  function next(stage){a.stage=stage;a.elapsed=0;clearGoal(a);}
@@ -34,8 +34,8 @@ export function createCourierTour({actors,setFloorGoal,stepPath,requestElevator,
   if(a.stage==='tour-out'){
    const stop=q.room,side=Math.sign(stop.at[0]);r.state='walking';r.activity='走進'+stop.name+'工作室，拜訪夥伴';
    if((Math.abs(a.p[0])<.8&&q.lane===null&&!q.hostReady)||(Math.abs(a.p[0])<2.9&&!reserve(side))){r.state='observing';r.activity='在入口旁等候，讓零件配送先通過';a.moving=false;return;}
-   const approach=[side*2.86,-.78];
-   const target=a.floor===1&&side*a.p[0]<2.80?approach:stop.at;
+   const approach=a.floor===1?[side*2.86,-.78]:[side*2.64,-1.00];
+   const target=side*a.p[0]<(a.floor===1?2.80:2.58)?approach:stop.at;
    const arrived=walk(target,dt)&&target===stop.at;
    if(q.waiting>1.5&&Math.abs(a.p[0])<.8){release();clearGoal(a);q.waiting=0;}
    if(arrived){release();q.visits[stop.id]++;next('tour-visit');}
@@ -50,7 +50,8 @@ export function createCourierTour({actors,setFloorGoal,stepPath,requestElevator,
   if(a.stage==='tour-return'){
    const side=Math.sign(q.room.at[0]);r.state='returning';r.activity='回到連通處，準備拜訪下一間工作室';
    if(side*a.p[0]>.75&&((q.lane===null&&!q.hostReady)||!reserve(side))){a.moving=false;r.state='observing';r.activity='在房內稍候，讓搬零件的夥伴先通過';return;}
-   const arrived=walk(center,dt);if(Math.abs(a.p[0])<=.75)release();
+   const retTarget=a.floor===2&&side*a.p[0]>1.85?[side*1.76,-1.00]:center;
+   const arrived=walk(retTarget,dt)&&retTarget===center;if(Math.abs(a.p[0])<=.75)release();
    if(arrived){release();q.step++;next('tour-select');}return;
   }
   if(a.stage==='tour-center'){

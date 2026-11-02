@@ -1416,9 +1416,21 @@ export function createWorld(canvas, onSelectStudio, onSelectCenter, onReady, onE
         speeches.delete(key);
         continue;
       }
-      const obj = b.kind === 'resident' ? residentModels[b.index].p : animalModels[b.index].g;
-      const p = obj.position.clone();
-      p.y += b.kind === 'resident' ? 1.15 : 0.72;
+      let p;
+      if (b.kind === 'resident') {
+        const m = residentModels[b.index];
+        if (m.bones?.head) {
+          m.p.updateMatrixWorld(true);
+          p = m.bones.head.getWorldPosition(new THREE.Vector3());
+          p.y += 0.42;
+        } else {
+          p = m.p.position.clone();
+          p.y += 0.84;
+        }
+      } else {
+        p = animalModels[b.index].g.position.clone();
+        p.y += 0.55;
+      }
       p.project(camera);
       bubbles.push({
         ...b,
@@ -1717,20 +1729,18 @@ export function createWorld(canvas, onSelectStudio, onSelectCenter, onReady, onE
       if (cabinDoors.L) cabinDoors.L.rotation.y = -cabinDoorAngle;
       if (cabinDoors.R) cabinDoors.R.rotation.y = cabinDoorAngle;
 
-      const leftStairNearTop = town.actors.some(
-        a => (a.stage === 'stair-down' || a.stage === 'stair-up') && a.stairSide < 0 && a.stairT > 0.68
-      );
-      const rightStairNearTop = town.actors.some(
-        a => (a.stage === 'stair-down' || a.stage === 'stair-up') && a.stairSide > 0 && a.stairT > 0.68
-      );
-      if (stairGates.left) stairGates.left.rotation.y = leftStairNearTop ? -1.15 : 0;
-      if (stairGates.right) stairGates.right.rotation.y = rightStairNearTop ? 1.15 : 0;
+      // 2F stair-side railings remain fixed in place as stationary safety guardrails
+      if (stairGates.left) stairGates.left.rotation.y = 0;
+      if (stairGates.right) stairGates.right.rotation.y = 0;
 
       updateResidents(dt);
 
       town.doors.forEach((d, id) => {
         const pivot = doorPivots.get(id);
-        if (pivot) pivot.rotation.y = d.angle * 0.82;
+        if (pivot) {
+          const dir = id === 'door-switch' ? -1 : 1;
+          pivot.rotation.y = dir * d.angle * 0.82;
+        }
       });
 
       processTownEvents(events);
