@@ -8,7 +8,7 @@ export const COURIER_ROOMS = [
 
 export function createCourierTour({actors,setFloorGoal,stepPath,requestElevator,elevator,lanes,clearGoal}) {
  const a=actors[4];a.tour={floor:null,step:0,round:0,room:null,lane:null,waiting:0,distance:0,visits:Object.fromEntries(COURIER_ROOMS.map(r=>[r.id,0]))};
- const center=[0,-.42];
+ const center=[0,-.34];
  function release(){if(a.tour.lane!==null){const lane=lanes[a.tour.lane];if(lane.owner===4)lane.owner=null;a.tour.lane=null;}}
  function reserve(side){
   const q=a.tour,index=side<0?0:1,lane=lanes[index];if(q.lane===index)return true;
@@ -21,9 +21,9 @@ export function createCourierTour({actors,setFloorGoal,stepPath,requestElevator,
   const q=a.tour,r=a.r;
   if(a.stage==='working'){r.state='observing';r.activity='看看連通廊，準備下樓拜訪工作室';a.moving=false;if(a.elapsed>=2.6)next('to-lift-2f');return;}
   if(a.stage==='to-lift-2f'||a.stage==='to-lift-1f'){
-   r.state='walking';r.activity='走向升降臺，準備拜訪另一樓的夥伴';
-   const wait=a.floor===2?elevator.wait2F:elevator.wait1F;
-   if(walk([wait[0],wait[2]],dt)){release();requestElevator(a,'tour-select');}return;
+   release();r.state='walking';r.activity='走向升降臺旁開關，準備按紐呼叫轎廂';
+   const sw=a.floor===2?(elevator.switch2F||elevator.wait2F):(elevator.switch1F||elevator.wait1F);
+   if(walk([sw[0],sw[2]],dt)){requestElevator(a,'tour-select');}return;
   }
   if(a.stage==='tour-select'){
    if(q.floor!==a.floor){q.floor=a.floor;q.step=0;q.round++;}

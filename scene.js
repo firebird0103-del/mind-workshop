@@ -499,6 +499,7 @@ export function createWorld(canvas, onSelectStudio, onSelectCenter, onReady, onE
   const doorPivots = new Map();
   const stairGates = {left: null, right: null};
   const liftGates = {f1L: null, f1R: null, f2L: null, f2R: null};
+  const liftSwitchBtns = {f1: null, f2: null};
   const cabinDoors = {L: null, R: null};
   let elevatorCabin = null;
   let shaftGears = [];
@@ -786,6 +787,8 @@ export function createWorld(canvas, onSelectStudio, onSelectCenter, onReady, onE
       liftGates.f1R = map.elevatorTower.scene.getObjectByName('LiftGate_f1R');
       liftGates.f2L = map.elevatorTower.scene.getObjectByName('LiftGate_f2L');
       liftGates.f2R = map.elevatorTower.scene.getObjectByName('LiftGate_f2R');
+      liftSwitchBtns.f1 = map.elevatorTower.scene.getObjectByName('LiftSwitchBtn_f1');
+      liftSwitchBtns.f2 = map.elevatorTower.scene.getObjectByName('LiftSwitchBtn_f2');
       shaftGears = [
         map.elevatorTower.scene.getObjectByName('ShaftGear_1'),
         map.elevatorTower.scene.getObjectByName('ShaftGear_2'),
@@ -1581,7 +1584,7 @@ export function createWorld(canvas, onSelectStudio, onSelectCenter, onReady, onE
           switchResidentClip(m, isCarrying ? 'CarryWalk' : 'StairUp', 0.15);
         } else if (moving) {
           switchResidentClip(m, isCarrying ? 'CarryWalk' : 'Walk', 0.16);
-        } else if (r.state === 'delivering' || r.state === 'loading' || r.state === 'inspecting') {
+        } else if (r.state === 'delivering' || r.state === 'loading' || r.state === 'inspecting' || r.state === 'lift-press') {
           switchResidentClip(m, 'Work', 0.20);
         } else {
           switchResidentClip(m, 'Idle', 0.22);
@@ -1697,32 +1700,23 @@ export function createWorld(canvas, onSelectStudio, onSelectCenter, onReady, onE
       const events = town.update(dt);
       if (elevatorCabin) elevatorCabin.position.y = town.elevator.y;
 
-      const actorNearLift = fl =>
-        town.actors.some(
-          a =>
-            a.floor === fl &&
-            (a.usingElevator ||
-              a.stage === 'to-lift' ||
-              a.stage === 'from-lift' ||
-              Math.hypot(a.p[0] - ELEVATOR.x, a.p[1] - (ELEVATOR.z + 0.56)) < 0.88)
-        );
-      const targetOpen1F =
-        town.elevator.floor === 1 &&
-        !['moving','turning','moving-to-pickup'].includes(town.elevator.state) &&
-        (town.elevator.state === 'boarding' || town.elevator.state === 'exiting' || actorNearLift(1))
-          ? 1.25
-          : 0;
-      const targetOpen2F =
-        town.elevator.floor === 2 &&
-        !['moving','turning','moving-to-pickup'].includes(town.elevator.state) &&
-        (town.elevator.state === 'boarding' || town.elevator.state === 'exiting' || actorNearLift(2))
-          ? 1.25
-          : 0;
-      const targetCabinOpen = Math.max(targetOpen1F, targetOpen2F);
+      const doorOpenRatio = town.elevator.doorOpen ?? (
+        ['opening-doors', 'boarding', 'opening-exit-doors', 'exiting'].includes(town.elevator.state) ? 1 : 0
+      );
+      const targetOpen1F = town.elevator.floor === 1 ? doorOpenRatio * 1.56 : 0;
+      const targetOpen2F = town.elevator.floor === 2 ? doorOpenRatio * 1.56 : 0;
+      const targetCabinOpen = doorOpenRatio * 1.50;
 
-      liftDoorAngle1F += (targetOpen1F - liftDoorAngle1F) * Math.min(1, dt * 10);
-      liftDoorAngle2F += (targetOpen2F - liftDoorAngle2F) * Math.min(1, dt * 10);
-      cabinDoorAngle += (targetCabinOpen - cabinDoorAngle) * Math.min(1, dt * 10);
+      liftDoorAngle1F += (targetOpen1F - liftDoorAngle1F) * Math.min(1, dt * 14);
+      liftDoorAngle2F += (targetOpen2F - liftDoorAngle2F) * Math.min(1, dt * 14);
+      cabinDoorAngle += (targetCabinOpen - cabinDoorAngle) * Math.min(1, dt * 14);
+
+      if (liftSwitchBtns.f1) {
+        liftSwitchBtns.f1.position.z = town.elevator.switchActiveFloor === 1 ? 0.658 : 0.675;
+      }
+      if (liftSwitchBtns.f2) {
+        liftSwitchBtns.f2.position.z = town.elevator.switchActiveFloor === 2 ? 0.658 : 0.675;
+      }
 
       if (liftGates.f1L) liftGates.f1L.rotation.y = -liftDoorAngle1F;
       if (liftGates.f1R) liftGates.f1R.rotation.y = liftDoorAngle1F;

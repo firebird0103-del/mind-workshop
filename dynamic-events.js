@@ -4,7 +4,7 @@ import {LIFE_LAYOUT as L} from './life-layout.js';
 // Composes spontaneous, context-aware workshop events across 4 categories while keeping
 // base studio/life/courier routines as the fallback and immediately yielding to priority deliveries.
 
-const ZONE_2F_FULL = ([x, z]) => z <= 0.60;
+const ZONE_2F_FULL = ([x, z]) => z <= 0.60 && !(Math.abs(x) < 0.50 && z < -0.45);
 const ZONE_1F_LEFT = ([x, z]) => x <= -0.88 && x >= -6.45 && z <= 2.90;
 const ZONE_1F_RIGHT = ([x, z]) => x >= 0.88 && x <= 6.45 && z <= 2.90;
 

@@ -157,10 +157,13 @@ export const ELEVATOR = {
   radius: 0.56,
   floor1Y: WORKSHOP.floor1Y,
   floor2Y: WORKSHOP.floor2Y,
-  wait1F: [0, WORKSHOP.floor1Y, -0.42],
+  switch1F: [0.66, WORKSHOP.floor1Y, -0.34],
+  switch2F: [0.66, WORKSHOP.floor2Y, -0.34],
+  switchPos: [0.66, -0.76],
+  wait1F: [0, WORKSHOP.floor1Y, -0.34],
   cabin1F: [0, WORKSHOP.floor1Y, -1.38],
   cabin2F: [0, WORKSHOP.floor2Y, -1.38],
-  wait2F: [0, WORKSHOP.floor2Y, -0.56],
+  wait2F: [0, WORKSHOP.floor2Y, -0.34],
   bridgeLeft: [-2.36, WORKSHOP.floor2Y, -0.95],
   bridgeRight: [2.36, WORKSHOP.floor2Y, -0.95]
 };

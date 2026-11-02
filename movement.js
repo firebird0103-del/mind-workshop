@@ -214,6 +214,8 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[], res
     state: 'idle',
     owner: null,
     timer: 0,
+    doorOpen: 0,
+    switchActiveFloor: null,
     queue: []
   };
 
@@ -228,7 +230,7 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[], res
     // 3: 方方 (Switch 1F Right - sorting geometric shapes in the purple studio)
     {floor: 1, pos: [3.42, -0.57], homePos: [3.42, -0.57], homeFloor: 1, workPos: [3.05, 0.0], transport: 'door-switch', deliverySpot: CENTRAL_WORKBENCH.deliverySpots[3], initDelay: -17.5},
     // 4: 小郵 (Elevator operator - starting on 2F bridge / elevator cabin)
-    {floor: 2, pos: [-0.45, -0.82], homePos: [-0.88, -1.0], homeFloor: 2, workPos: [0.88, -1.0], transport: 'elevator', deliverySpot: CENTRAL_WORKBENCH.deliverySpots[4], initDelay: -3.0},
+    {floor: 2, pos: [0.66, -0.34], homePos: [-0.88, -1.0], homeFloor: 2, workPos: [0.88, -1.0], transport: 'elevator', deliverySpot: CENTRAL_WORKBENCH.deliverySpots[4], initDelay: -3.0},
     // 5: 朵朵 (Central Workbench Left Assembler - clear of workbench rim & push-cart)
     {floor: 1, pos: [-5.02, 0.52], homePos: [-5.02, 0.52], homeFloor: 1, workPos: [-5.02, 0.52], transport: 'atrium', deliverySpot: CENTRAL_WORKBENCH.deliverySpots[5], initDelay: -2.0},
     // 6: 點點 (Central Workbench Right Assembler - clear of workbench rim & cat-crate)
@@ -310,7 +312,7 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[], res
     if(a.index<4){const side=a.index%2===0?-1:1;if(a.routine?.active)return([x])=>side*x>=(a.floor===2?2.86:2.64)-1e-6;if(a.floor===2)return([x])=>side*x>=1.55;
       if(a.index>=2)return([x,z])=>side*x>=.88&&side*x<=6.45&&z<=2.10&&!(Math.abs(x-side*2.42)<.08&&Math.abs(z-.98)<.14);
       return([x,z])=>side*x>=.75&&side*x<=2.16&&z>=.74;}
-    if(a.index===4)return a.floor===2?([x,z])=>Math.abs(x)<=1.10+1e-6||z<=-1.00+1e-6||Math.abs(x)>=2.50:([x,z])=>Math.abs(x)<=5.2&&z>=-.86&&z<=.35;
+    if(a.index===4)return a.floor===2?([x,z])=>!(Math.abs(x)<.50&&z<-.45)&&(Math.abs(x)<=1.10+1e-6||z<=-1.00+1e-6||Math.abs(x)>=2.50):([x,z])=>!(Math.abs(x)<.50&&z<-.45)&&Math.abs(x)<=5.2&&z>=-.86&&z<=.35;
     return a.index===6?([x,z])=>x>=3.65&&z<.85:([x,z])=>x<=-3.30&&z>-.25&&z<1.35;
   }
   function replan(a) {
@@ -430,19 +432,15 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[], res
 
   function stepElevator(dt) {
     if (elevator.owner === null) {
+      elevator.doorOpen = 0;
+      elevator.switchActiveFloor = null;
       if (elevator.queue.length > 0) {
         const nextIdx = elevator.queue.shift();
         elevator.owner = nextIdx;
         const a = actors[nextIdx];
-        const desiredFloor = a.floor;
-        if (elevator.floor !== desiredFloor) {
-          elevator.state = 'moving-to-pickup';
-          elevator.targetFloor = desiredFloor;
-        } else {
-          elevator.state = 'boarding';
-          elevator.entryStart=[...a.p];
-          elevator.timer = 0;
-        }
+        elevator.state = 'pressing-switch';
+        elevator.timer = 0;
+        elevator.switchActiveFloor = a.floor;
       }
       return;
     }
@@ -450,31 +448,89 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[], res
     const a = actors[elevator.owner];
     if (!a) {
       elevator.owner = null;
+      elevator.doorOpen = 0;
+      elevator.switchActiveFloor = null;
       elevator.state = 'idle';
       return;
     }
 
     const rideState = elevator.state;
-    if (elevator.state === 'moving-to-pickup') {
+    if (elevator.state === 'pressing-switch') {
+      elevator.timer += dt;
+      elevator.doorOpen = 0;
+      elevator.switchActiveFloor = a.floor;
+      const swPos = ELEVATOR.switchPos || [0.66, -0.76];
+      a.yaw = Math.atan2(swPos[0] - a.p[0], swPos[1] - a.p[1]);
+      a.moving = false;
+      a.r.state = 'lift-press';
+      a.r.activity = '按下升降臺旁開關，呼叫轎廂開門';
+      if (elevator.timer >= 0.28) {
+        if (elevator.floor !== a.floor) {
+          elevator.state = 'moving-to-pickup';
+          elevator.targetFloor = a.floor;
+          elevator.timer = 0;
+        } else {
+          elevator.state = 'opening-doors';
+          elevator.timer = 0;
+        }
+      }
+    } else if (elevator.state === 'moving-to-pickup') {
+      elevator.doorOpen = 0;
+      elevator.switchActiveFloor = a.floor;
+      a.moving = false;
+      a.r.state = 'lift-press';
+      a.r.activity = '按下開關後，在旁等候升降臺抵達';
       const targetY = elevator.targetFloor === 1 ? WORKSHOP.floor1Y : WORKSHOP.floor2Y;
       const dir = Math.sign(targetY - elevator.y);
       elevator.y += dir * Math.min(Math.abs(targetY-elevator.y),dt*1.35);
       if (Math.abs(targetY - elevator.y) <= 0.04) {
         elevator.y = targetY;
         elevator.floor = elevator.targetFloor;
+        elevator.state = 'opening-doors';
+        elevator.timer = 0;
+      }
+    } else if (elevator.state === 'opening-doors') {
+      elevator.timer += dt;
+      elevator.doorOpen = Math.min(1, elevator.timer / 0.26);
+      elevator.switchActiveFloor = a.floor;
+      const waitPt = elevator.floor === 1 ? ELEVATOR.wait1F : ELEVATOR.wait2F;
+      a.yaw = Math.atan2(waitPt[0] - a.p[0], waitPt[2] - a.p[1]);
+      a.moving = false;
+      a.r.state = 'lift-press';
+      a.r.activity = '確認升降臺艙門完全開啟，準備進入轎廂';
+      if (elevator.timer >= 0.28) {
+        elevator.doorOpen = 1;
+        elevator.switchActiveFloor = null;
         elevator.state = 'boarding';
-        elevator.entryStart=[...a.p];
+        elevator.entryStart = [...a.p];
         elevator.timer = 0;
       }
     } else if (elevator.state === 'boarding') {
       elevator.timer += dt;
+      elevator.doorOpen = 1;
       const cab = elevator.floor === 1 ? ELEVATOR.cabin1F : ELEVATOR.cabin2F;
-      const u = Math.min(1, elevator.timer / 1.0);
-      const from=elevator.entryStart||a.p;
-      const next = [from[0]+(cab[0]-from[0])*u,from[1]+(cab[2]-from[1])*u];
+      const waitPt = elevator.floor === 1 ? ELEVATOR.wait1F : ELEVATOR.wait2F;
+      const u = Math.min(1, elevator.timer / 0.95);
+      const from = elevator.entryStart || a.p;
+      let next, dirFrom;
+      if (Math.abs(from[0] - waitPt[0]) > 0.05) {
+        if (u <= 0.35) {
+          const t1 = u / 0.35;
+          next = [from[0] + (waitPt[0] - from[0]) * t1, from[1] + (waitPt[2] - from[1]) * t1];
+          dirFrom = from;
+        } else {
+          const t2 = (u - 0.35) / 0.65;
+          next = [waitPt[0] + (cab[0] - waitPt[0]) * t2, waitPt[2] + (cab[2] - waitPt[2]) * t2];
+          dirFrom = [waitPt[0], waitPt[2]];
+        }
+      } else {
+        next = [from[0] + (cab[0] - from[0]) * u, from[1] + (cab[2] - from[1]) * u];
+        dirFrom = from;
+      }
       if (!canMove(a,next)) { elevator.timer-=dt; a.moving=false; return; }
+      const stepDx = next[0] - a.p[0], stepDz = next[1] - a.p[1];
+      if (Math.hypot(stepDx, stepDz) > 1e-8) a.yaw = Math.atan2(stepDx, stepDz);
       a.p=next;
-      a.yaw = Math.atan2(cab[0]-from[0],cab[2]-from[1]);
       a.moving = true;
       a.r.state = 'lift-enter';
       a.r.activity='走進升降臺，確認轎廂入口';
@@ -484,9 +540,12 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[], res
         elevator.timer = 0;
       }
     } else if(elevator.state==='turning'){
-      elevator.timer+=dt;const u=Math.min(1,elevator.timer/.45);a.yaw=Math.PI*(1-u*u*(3-2*u));a.moving=false;a.r.state='lift-wait';a.r.activity='在轎廂內轉身，等門關妥';
-      if(u>=1){elevator.state='moving';elevator.timer=0;}
+      elevator.timer+=dt;
+      elevator.doorOpen = Math.max(0, 1 - elevator.timer / 0.34);
+      const u=Math.min(1,elevator.timer/.42);a.yaw=Math.PI*(1-u*u*(3-2*u));a.moving=false;a.r.state='lift-wait';a.r.activity='在轎廂內轉身，等門關妥';
+      if(u>=1){elevator.doorOpen=0;elevator.state='moving';elevator.timer=0;}
     } else if (elevator.state === 'moving') {
+      elevator.doorOpen = 0;
       const targetY = elevator.targetFloor === 1 ? WORKSHOP.floor1Y : WORKSHOP.floor2Y;
       const dir = Math.sign(targetY - elevator.y);
       elevator.y += dir * Math.min(Math.abs(targetY-elevator.y),dt*1.25);
@@ -497,18 +556,33 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[], res
       a.moving = false;
       a.r.state = 'lift-move';
       a.r.activity='搭乘升降臺巡視樓層';
-      if (Math.abs(targetY - elevator.y) <= 0.04) {
+      if (Math.abs(targetY - elevator.y) <= 0.02) {
         elevator.y = targetY;
         elevator.floor = elevator.targetFloor;
         a.floor = elevator.floor;
         a.y = elevator.y;
+        elevator.state = 'opening-exit-doors';
+        elevator.timer = 0;
+      }
+    } else if (elevator.state === 'opening-exit-doors') {
+      elevator.timer += dt;
+      elevator.doorOpen = Math.min(1, elevator.timer / 0.24);
+      a.p[0] = ELEVATOR.x;
+      a.p[1] = ELEVATOR.z;
+      a.yaw = 0;
+      a.moving = false;
+      a.r.state = 'lift-wait';
+      a.r.activity = '抵達樓層，等待艙門開啟';
+      if (elevator.timer >= 0.26) {
+        elevator.doorOpen = 1;
         elevator.state = 'exiting';
         elevator.timer = 0;
       }
     } else if (elevator.state === 'exiting') {
       elevator.timer += dt;
+      elevator.doorOpen = 1;
       const waitPt = elevator.floor === 1 ? ELEVATOR.wait1F : ELEVATOR.wait2F;
-      const u = Math.min(1, elevator.timer / .95);
+      const u = Math.min(1, elevator.timer / .88);
       const next = [ELEVATOR.x+(waitPt[0]-ELEVATOR.x)*u,ELEVATOR.z+(waitPt[2]-ELEVATOR.z)*u];
       if (!canMove(a,next)) { elevator.timer-=dt; a.moving=false; return; }
       a.p=next;
@@ -522,10 +596,11 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[], res
         a.elapsed = 0;
         a.goal = null;
         elevator.owner = null;
+        elevator.doorOpen = 0;
         elevator.state = 'idle';
       }
     }
-    if (['boarding','turning','moving','exiting'].includes(rideState)) {
+    if (['boarding','turning','moving','opening-exit-doors','exiting'].includes(rideState) || ['boarding','turning','moving','opening-exit-doors','exiting'].includes(elevator.state)) {
       const front=LANDING_LAYOUT.threshold.localZ+LANDING_LAYOUT.threshold.depth/2;
       const height=LANDING_LAYOUT.cabinFloorRise*Math.max(0,Math.min(1,(front-(a.p[1]-ELEVATOR.z))/LANDING_LAYOUT.thresholdRampRun));
       a.y=elevator.y+height;
@@ -535,8 +610,8 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[], res
   function requestElevator(a, nextStage) {
     a.targetStageAfterLift = nextStage;
     a.usingElevator = true;
-    a.stage = 'lift-wait';
-    a.r.state = 'lift-wait';
+    a.stage = 'lift-press';
+    a.r.state = 'lift-press';
     if (elevator.owner !== a.index && !elevator.queue.includes(a.index)) {
       elevator.queue.push(a.index);
     }
