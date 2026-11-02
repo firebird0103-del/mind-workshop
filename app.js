@@ -39,6 +39,10 @@ settings.lampPitch=Math.max(25,Math.min(75,Number(settings.lampPitch)||58));
 settings.lampYaw=Math.max(-25,Math.min(25,(Number.isFinite(Number(settings.lampYaw))?Number(settings.lampYaw):-12)));
 settings.lamp=normalizeLamp({...settings.lamp,pitch:settings.lamp?.pitch??settings.lampPitch,yaw:settings.lamp?.yaw??settings.lampYaw});
 settings.volume = Math.max(0, Math.min(1, Number(settings.volume) || 0));
+const urlResidentMode = displayParams.get('residentMode');
+settings.residentMode = (urlResidentMode === 'dynamic' || urlResidentMode === 'classic')
+  ? urlResidentMode
+  : (settings.residentMode === 'dynamic' ? 'dynamic' : 'classic');
 for (const key of Object.keys(DEFAULTS.paths)) settings.paths[key] = DEFAULTS.paths[key];
 
 if (isDemo) { settings.motion=false; settings.sound=false; settings.age=3; }
@@ -612,6 +616,12 @@ function settingsPanel() {
     `<input id="volume" type="range" min="0" max="100" value="${Math.round(settings.volume * 100)}"></label>` +
     `<label class="settings-field">3D 畫面精細度 <output id="qualityOutput">${settings.quality.toFixed(2)}</output>` +
     `<input id="quality" type="range" min="1" max="1.75" step="0.05" value="${settings.quality}"></label>` +
+    `<label class="settings-field">居民活動模式（切換後自動重啟工坊）` +
+    `<select id="residentModeSelect">` +
+    `<option value="classic" ${settings.residentMode !== 'dynamic' ? 'selected' : ''}>1. 經典規律模式（原版固定巡邏）</option>` +
+    `<option value="dynamic" ${settings.residentMode === 'dynamic' ? 'selected' : ''}>2. 動態事件模式（24h 隨機組合事件）</option>` +
+    `</select></label>` +
+    `<p class="muted" style="margin-top:-4px;margin-bottom:10px;font-size:.84rem;">模式 2 會在基礎工作之餘，隨機組合「跨區請益、接力上發條、圓桌圍觀品評、偶遇動物夥伴」等動態事件；切換後會儲存並重新載入工坊。</p>` +
     '<div class="settings-buttons">' +
     `<button id="toggleMotionBtn" type="button">${settings.motion&&!reduced.matches?'Ⅱ 暫停日常動畫':'▷ 開啟日常動畫'}</button>` +
     '<button id="oldConfig" type="button">開啟原版遊戲 Config ↗</button>' +
@@ -638,6 +648,23 @@ function settingsPanel() {
     world?.setQuality(settings.quality);
     saveSettings();
   };
+
+  const modeSelect = $('#residentModeSelect');
+  if (modeSelect) {
+    modeSelect.onchange = e => {
+      const nextMode = e.target.value === 'dynamic' ? 'dynamic' : 'classic';
+      if (nextMode === settings.residentMode) return;
+      settings.residentMode = nextMode;
+      if (isDemo) {
+        const u = new URL(location.href);
+        u.searchParams.set('residentMode', nextMode);
+        location.assign(u.toString());
+        return;
+      }
+      saveSettings();
+      location.reload();
+    };
+  }
 
   $('#toggleMotionBtn').onclick = () => {
     if(reduced.matches)return toast('目前依裝置的「減少動態效果」偏好暫停動畫。');
@@ -744,7 +771,8 @@ try {
     error => {
       const message=error?.message || '無法建立繪圖畫面';
       $('#loading').textContent=`工坊未能完整載入：${message}。請完整解壓縮，透過 START-WINDOWS.cmd 或 Python 伺服器開啟，再重新整理。`;
-    }
+    },
+    {residentMode: settings.residentMode}
   );
 
   if (world) {
@@ -1024,7 +1052,7 @@ function openResidentsPanel(){
   $('#panelContent').innerHTML =
     '<div class="eyebrow">WORKSHOP COMMUNITY</div>' +
     '<h2>工坊居民與動物夥伴</h2>' +
-    '<p class="muted">點選任一居民或動物，鏡頭會移近並立即與他打招呼。</p>' +
+    `<p class="muted">目前模式：<strong>${settings.residentMode === 'dynamic' ? '2. 動態事件模式（隨機組合事件）' : '1. 經典規律模式（原版）'}</strong>｜點選任一居民或動物，鏡頭會移近並立即與他打招呼。</p>` +
     '<h3>動物夥伴</h3><div id="animalList"></div>' +
     '<h3>工坊居民名冊（8 位）</h3><div id="residentList"></div>';
   for (const a of world?.animals() || []) {

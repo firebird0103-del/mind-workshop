@@ -64,6 +64,7 @@ export const DEFAULTS = {
   cutaway: true,
   quality: 1.4,
   age: -1,
+  residentMode: 'classic',
   paths: {
     time: 'legacy/clock_game.html',
     spot: 'legacy/find_diff_game.html',

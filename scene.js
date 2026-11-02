@@ -92,7 +92,7 @@ const GLB_MANIFEST = {
   distantRoom: 'assets/surroundings/distant_workshop_room.glb'
 };
 
-export function createWorld(canvas, onSelectStudio, onSelectCenter, onReady, onError) {
+export function createWorld(canvas, onSelectStudio, onSelectCenter, onReady, onError, worldOptions = {}) {
   let renderer;
   try {
     renderer = new THREE.WebGLRenderer({canvas, antialias: true, alpha: false, powerPreference: 'high-performance'});
@@ -567,10 +567,36 @@ export function createWorld(canvas, onSelectStudio, onSelectCenter, onReady, onE
   });
 
   let animalAvoidance=()=>[];
+  let resolvedResidentMode = worldOptions?.residentMode;
+  if (!resolvedResidentMode) {
+    try {
+      const paramMode = new URLSearchParams(globalThis.location?.search || '').get('residentMode');
+      if (paramMode === 'dynamic' || paramMode === 'classic') resolvedResidentMode = paramMode;
+      else {
+        const stored = JSON.parse(globalThis.localStorage?.getItem('brainWorkshop.v1.settings') || '{}');
+        resolvedResidentMode = stored?.residentMode === 'dynamic' ? 'dynamic' : 'classic';
+      }
+    } catch {
+      resolvedResidentMode = 'classic';
+    }
+  }
   const town = createWorkshopTown(
     residentModels.map(m => m.r),
     nav,
-    {dynamicObstacles:()=>animalAvoidance()}
+    {
+      dynamicObstacles: () => animalAvoidance(),
+      residentMode: resolvedResidentMode,
+      getContext: () => ({
+        workName: currentBlueprint?.name || '機械小鳥',
+        installedCount: installedParts?.size || 0,
+        animals: (typeof animalModels !== 'undefined' ? animalModels : []).map(a => ({
+          index: a.index,
+          floor: a.floor,
+          p: [a.curPos?.[0] ?? a.center[0], a.curPos?.[2] ?? a.center[2]],
+          state: a.patrolState || 'perch'
+        }))
+      })
+    }
   );
   town.actors.forEach((a, i) => {
     residentModels[i].p.position.set(a.p[0], a.y, a.p[1]);
@@ -1602,6 +1628,23 @@ export function createWorld(canvas, onSelectStudio, onSelectCenter, onReady, onE
             greetResident(r);
             greetResident(other);
           }
+        } else if (type === 'dynamic-log') {
+          if (extra) eventCallback(extra);
+        } else if (type === 'dynamic-speech') {
+          const now = performance.now();
+          const blocked = !ambientGate() || [...speeches.values()].some(b => b.interactive && b.until > now);
+          if (!blocked && extra?.text) {
+            say('resident', idx, extra, false);
+            chatter.defer(now, 4500);
+          }
+          if (extra?.logText) eventCallback(extra.logText);
+        } else if (type === 'dynamic-animal-speech') {
+          const now = performance.now();
+          const blocked = !ambientGate() || [...speeches.values()].some(b => b.interactive && b.until > now);
+          if (!blocked && extra?.text && animalModels[idx]) {
+            say('animal', idx, extra, false);
+            chatter.defer(now, 4200);
+          }
         }
       }
 
@@ -1958,6 +2001,8 @@ export function createWorld(canvas, onSelectStudio, onSelectCenter, onReady, onE
         assetsReady,
         viewingMode,paused,navigationMode:panMode?'pan':'rotate',cameraOffsetY:camera.view?.enabled?camera.view.offsetY:0,
         simulationSeconds: +simTime.toFixed(3),
+        residentMode: town.residentMode,
+        dynamicEvents: town.dynamicEvents?.getStats() || null,
         work:workPresentation.stats(),
         life:lifePresentation?.stats(),
         gramophoneAudio:gramophoneAudio.stats(),

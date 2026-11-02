@@ -1,3 +1,4 @@
+import {createDynamicEventDirector} from './dynamic-events.js';
 import {createCourierTour} from './courier-tour.js';
 import {createStudioRoutines} from './studio-routines.js';
 import {LANDING_LAYOUT} from './landing-layout.js';
@@ -204,7 +205,7 @@ export function createWorkshopNavigation() {
   };
 }
 
-export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[]}={}) {
+export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[], residentMode='classic', getContext, random}={}) {
   const doors = new Map(DOORS.map(d => [d.id, {...d, angle: 0, owner: null}]));
   const elevator = {
     floor: 2,
@@ -305,6 +306,7 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[]}={})
   }
 
   function allowedFor(a){
+    if(a.dynamicAllowed)return a.dynamicAllowed;
     if(a.index<4){const side=a.index%2===0?-1:1;if(a.routine?.active)return([x])=>side*x>=(a.floor===2?2.50:2.64)-1e-6;if(a.floor===2)return([x])=>side*x>=1.55;
       if(a.index>=2)return([x,z])=>side*x>=.88&&side*x<=6.45&&z<=2.10;
       return([x,z])=>side*x>=.75&&side*x<=2.16&&z>=.74;}
@@ -545,6 +547,7 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[]}={})
     const a = actors[actorIndex];
     if (!a) return null;
     studioRoutines.interrupt(a);
+    dynamicEvents?.interruptActor(a);
     a.priorityDelivery = true;
     a.priorityPartName = partName;
     a.r.greeting = 0;
@@ -560,6 +563,10 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[]}={})
   const studioRoutines=createStudioRoutines({actors,setFloorGoal,stepPath});
 
   const courierTour=createCourierTour({actors,setFloorGoal,stepPath,requestElevator,elevator:ELEVATOR,lanes,clearGoal:a=>{a.goal=null;a.path=[];a.replanDelay=0;}});
+  const normalizedResidentMode = residentMode === 'dynamic' ? 'dynamic' : 'classic';
+  const dynamicEvents = normalizedResidentMode === 'dynamic'
+    ? createDynamicEventDirector({actors, nav, setFloorGoal, stepPath, elevator: ELEVATOR, lanes, life, studioRoutines, getContext, random})
+    : null;
 
   function update(dt) {
     dt = Math.max(0, Math.min(dt, 0.25));
@@ -568,6 +575,8 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[]}={})
     stepElevator(dt);
 
     resolveOverlaps();
+
+    if (dynamicEvents) dynamicEvents.tick(dt, events);
 
     for (const a of actors) {
       const r = a.r;
@@ -593,7 +602,7 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[]}={})
 
       a.elapsed += dt;
       if(a.index>=5){life.update(a,dt);continue;}
-      if(a.index<4&&!a.priorityDelivery&&['working','resting'].includes(a.stage)){if(!courierTour.hostUpdate(a,dt))studioRoutines.update(a,dt);continue;}
+      if(a.index<4&&!a.priorityDelivery&&['working','resting'].includes(a.stage)){if(dynamicEvents?.updateActor(a,dt))continue;if(!courierTour.hostUpdate(a,dt))studioRoutines.update(a,dt);continue;}
       if(a.index<4&&a.stage==='return-parcel'){
         r.state='retrieving';a.moving=false;
         a.parcel.state='return-pick';a.parcel.progress=Math.min(1,a.elapsed/.65);
@@ -624,7 +633,7 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[]}={})
       }
       if(a.index<4&&a.stage==='to-source'){
         r.state='returning';setFloorGoal(a,LIFE_LAYOUT.couriers[a.index].pickup);
-        if(stepPath(a,dt,1.60)){a.stage='collecting';a.elapsed=0;a.goal=null;}
+        if(stepPath(a,dt,1.60)){if(a.dynamicLane!=null){if(lanes[a.dynamicLane]?.owner===a.index)lanes[a.dynamicLane].owner=null;a.dynamicLane=null;}a.dynamicAllowed=null;a.dynamicReturning=false;a.stage='collecting';a.elapsed=0;a.goal=null;}
         continue;
       }
       if(a.index<4&&a.stage==='collecting'){
@@ -811,6 +820,8 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[]}={})
     update,
     triggerStudioDelivery,
     requestAction,
-    life
+    life,
+    residentMode: normalizedResidentMode,
+    dynamicEvents
   };
 }
