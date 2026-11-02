@@ -169,32 +169,7 @@ export const ELEVATOR = {
 };
 
 // Side fences & gates moved outward to x = ±2.42 so the central atrium is wide and open!
-export const DOORS = [
-  {
-    id: 'door-memory',
-    name: '工作記憶低矮推門',
-    floor: 1,
-    x: -2.42,
-    y: WORKSHOP.floor1Y,
-    z: 0.96,
-    width: 0.68,
-    height: WORKSHOP.railH,
-    outside: [-2.82, WORKSHOP.floor1Y, 0.96],
-    inside: [-2.02, WORKSHOP.floor1Y, 0.96]
-  },
-  {
-    id: 'door-switch',
-    name: '語意判斷低矮推門',
-    floor: 1,
-    x: 2.42,
-    y: WORKSHOP.floor1Y,
-    z: 0.96,
-    width: 0.68,
-    height: WORKSHOP.railH,
-    outside: [2.82, WORKSHOP.floor1Y, 0.96],
-    inside: [2.02, WORKSHOP.floor1Y, 0.96]
-  }
-];
+export const DOORS = [];
 
 export const OBSTACLES_1F = [
   ...[-1,1].map(side=>({id:"lift-post-1f-"+side,shape:"circle",x:side*.54,z:-.87,radius:.105,hx:.105,hz:.105,top:6.1})),
