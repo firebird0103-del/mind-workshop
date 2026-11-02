@@ -50,8 +50,7 @@ export function createCourierTour({actors,setFloorGoal,stepPath,requestElevator,
   if(a.stage==='tour-return'){
    const side=Math.sign(q.room.at[0]);r.state='returning';r.activity='回到連通處，準備拜訪下一間工作室';
    if(side*a.p[0]>.75&&((q.lane===null&&!q.hostReady)||!reserve(side))){a.moving=false;r.state='observing';r.activity='在房內稍候，讓搬零件的夥伴先通過';return;}
-   const retTarget=a.floor===2&&side*a.p[0]>1.85?[side*1.76,-1.00]:center;
-   const arrived=walk(retTarget,dt)&&retTarget===center;if(Math.abs(a.p[0])<=.75)release();
+   const arrived=walk(center,dt);if(Math.abs(a.p[0])<=.75)release();
    if(arrived){release();q.step++;next('tour-select');}return;
   }
   if(a.stage==='tour-center'){

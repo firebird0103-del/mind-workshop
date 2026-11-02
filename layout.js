@@ -190,18 +190,6 @@ export const DOORS = [
     height: WORKSHOP.railH,
     outside: [2.82, WORKSHOP.floor1Y, 0.96],
     inside: [2.02, WORKSHOP.floor1Y, 0.96]
-  },
-  {
-    id: 'door-arch-back',
-    name: '後側迴廊低矮推門',
-    floor: 1,
-    x: 0.92,
-    y: WORKSHOP.floor1Y,
-    z: -0.82,
-    width: 0.64,
-    height: WORKSHOP.railH,
-    outside: [0.92, WORKSHOP.floor1Y, -0.42],
-    inside: [0.92, WORKSHOP.floor1Y, -1.22]
   }
 ];
 
@@ -232,8 +220,8 @@ export const OBSTACLES_1F = [
 
 export const OBSTACLES_2F = [
   {id:"landing-front-guard",x:0,z:.06,hx:1.32,hz:.04},
-  {id:"stair-guard-2f-left",x:-2.28,z:-0.56,hx:0.06,hz:0.18},
-  {id:"stair-guard-2f-right",x:2.28,z:-0.56,hx:0.06,hz:0.18},
+  {id:"stair-guard-2f-left",x:-2.28,z:-0.44,hx:0.06,hz:0.20},
+  {id:"stair-guard-2f-right",x:2.28,z:-0.44,hx:0.06,hz:0.20},
   ...[-1,1].map(side=>({id:"lift-post-2f-"+side,shape:"circle",x:side*.54,z:-.87,radius:.105,hx:.105,hz:.105})),
   ...LIFE_LAYOUT.couriers.slice(0,2).map((c,i)=>({id:"parcel-source-"+i,shape:"circle",x:c.source[0],z:c.source[2],radius:.115,hx:.115,hz:.115})),
   {id:'lift-shaft-2f',shape:'circle',x:0,z:-1.38,radius:.65,hx:.65,hz:.65},

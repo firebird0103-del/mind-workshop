@@ -308,7 +308,7 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[], res
   function allowedFor(a){
     if(a.dynamicAllowed)return a.dynamicAllowed;
     if(a.index<4){const side=a.index%2===0?-1:1;if(a.routine?.active)return([x])=>side*x>=(a.floor===2?2.86:2.64)-1e-6;if(a.floor===2)return([x])=>side*x>=1.55;
-      if(a.index>=2)return([x,z])=>side*x>=.88&&side*x<=6.45&&z<=2.10;
+      if(a.index>=2)return([x,z])=>side*x>=.88&&side*x<=6.45&&z<=2.10&&!(Math.abs(x-side*2.42)<.08&&Math.abs(z-.98)<.14);
       return([x,z])=>side*x>=.75&&side*x<=2.16&&z>=.74;}
     if(a.index===4)return a.floor===2?([x,z])=>Math.abs(x)<=1.10+1e-6||z<=-1.00+1e-6||Math.abs(x)>=2.50:([x,z])=>Math.abs(x)<=5.2&&z>=-.86&&z<=.35;
     return a.index===6?([x,z])=>x>=3.65&&z<.85:([x,z])=>x<=-3.30&&z>-.25&&z<1.35;
@@ -574,18 +574,19 @@ export function createWorkshopTown(residents, nav, {dynamicObstacles=()=>[], res
 
     stepElevator(dt);
 
-    // Automatically swing 1F wooden gates open when a 1F resident approaches or walks through them
+    // Only swing 1F wooden gates open when a 1F resident is genuinely crossing through the doorway [±2.42, 0.98]
     for (const [id, d] of doors) {
       if (d.owner !== null) continue;
-      const near = actors.some(a => {
-        if (a.floor !== 1) return false;
-        if (id === 'door-memory') return Math.abs(a.p[0] - (-2.42)) < 0.72 && a.p[1] > 0.38 && a.p[1] < 1.46;
-        if (id === 'door-switch') return Math.abs(a.p[0] - 2.42) < 0.72 && a.p[1] > 0.38 && a.p[1] < 1.46;
-        if (id === 'door-arch-back') return Math.abs(a.p[0] - 0.92) < 0.76 && Math.abs(a.p[1] - (-0.82)) < 0.54;
-        return false;
+      const crossing = actors.some(a => {
+        if (a.floor !== 1 || !a.moving) return false;
+        if (Math.abs(a.p[0] - d.x) > 0.45 || Math.abs(a.p[1] - 0.98) > 0.22) return false;
+        if (Math.abs(a.p[0] - d.x) < 0.16 && Math.abs(a.p[1] - 0.98) < 0.16) return true;
+        if (!Array.isArray(a.path) || !a.path.some(pt => Math.abs(pt[0] - d.x) < 0.08 && Math.abs(pt[1] - 0.98) < 0.14)) return false;
+        const pts = [a.p, ...a.path];
+        return pts.some(pt => Math.abs(pt[0]) >= 2.55) && pts.some(pt => Math.abs(pt[0]) <= 2.25);
       });
-      const targetAngle = near ? 1.45 : 0;
-      const rate = near ? 5.2 : 3.6;
+      const targetAngle = crossing ? 1.45 : 0;
+      const rate = crossing ? 6.0 : 4.2;
       d.angle += Math.sign(targetAngle - d.angle) * Math.min(Math.abs(targetAngle - d.angle), dt * rate);
     }
 
